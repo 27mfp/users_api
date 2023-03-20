@@ -1,0 +1,30 @@
+# routes.yaml
+api_users_collection:
+  path: /api/users
+  controller: App\Controller\UserController::index
+  methods: ["GET"]
+
+api_create_user:
+  path: /api/users
+  controller: App\Controller\UserController::create
+  methods: ["POST"]
+
+api_single_user:
+  path: /api/users/{id<\d+>}
+  controller: App\Controller\UserController::single
+  methods: ["GET"]
+
+api_update_user:
+  path: /api/users/{id<\d+>}
+  controller: App\Controller\UserController::update
+  methods: ["PUT"]
+
+api_delete_user:
+  path: /api/users/{id<\d+>}
+  controller: App\Controller\UserController::delete
+  methods: ["DELETE"]
+
+api_search_users:
+  path: /api/users/search
+  controller: App\Controller\UserController::searchUsersByEmail
+  methods: ["GET"]

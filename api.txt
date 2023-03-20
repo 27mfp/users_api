@@ -1,0 +1,23 @@
+Users API
+
+    -This is a simple API built with Symfony 6 that allows you to manage a list of users.
+
+Endpoints
+
+GET /api/users - Returns a list of all users in the database.
+
+POST /api/users - Adds a new user to the database. The request body should be a JSON object containing the following properties:
+
+name (required): The name of the user.
+email (required): The email address of the user.
+
+GET /api/users/{id} - Returns the details of a specific user.
+
+PUT /api/users/{id} - Updates the details of a specific user. The request body should be a JSON object containing the following properties:
+
+name (optional): The new name of the user.
+email (optional): The new email address of the user.
+
+DELETE /api/users/{id} - Deletes a specific user from the database.
+
+GET /api/users/search - Searches for users by email address. The request should include a q query parameter that contains the email address to search for.
