@@ -57,7 +57,7 @@ email: The email address of the user.
 
 This endpoint allows the searching of a user by email address. The request must include the email address of the user to be searched for in the query parameter email.
 
-    PUT /users/{emailid} - Update a specific user by email
+    PUT /users/{email} - Update a specific user by email
 
 This endpoint allows the updating of an existing user. The request must include the following parameters:
 name: The name of the user.
@@ -66,6 +66,8 @@ email: The email address of the user.
     DELETE /users/{email} - Delete a specific user by email
 
 This endpoint allows the deletion of an existing user. The request must include the email address of the user to be deleted.
+
+### Requests
 
 To use the API, send HTTP requests to the appropriate endpoint using a tool like curl, Postman, or a web browser. For example, to create a new user using curl, you could run:
 
