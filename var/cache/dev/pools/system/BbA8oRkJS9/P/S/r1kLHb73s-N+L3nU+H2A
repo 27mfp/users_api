@@ -1,3 +1,0 @@
-<?php //Doctrine%255CBundle%255CDoctrineBundle%255CRepository%255CServiceEntityRepository
-
-return [PHP_INT_MAX, []];

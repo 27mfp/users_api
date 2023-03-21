@@ -4,8 +4,10 @@
 
 return [
     '_preview_error' => [['code', '_format'], ['_controller' => 'error_controller::preview', '_format' => 'html'], ['code' => '\\d+'], [['variable', '.', '[^/]++', '_format', true], ['variable', '/', '\\d+', 'code', true], ['text', '/_error']], [], [], []],
-    'users_list' => [[], ['_controller' => 'App\\Controller\\UserController::index'], [], [['text', '/api/users']], [], [], []],
-    'users_single' => [['user'], ['_controller' => 'App\\Controller\\UserController::single'], [], [['variable', '/', '[^/]++', 'user', true], ['text', '/api/users']], [], [], []],
-    'users_create' => [[], ['_controller' => 'App\\Controller\\UserController::create'], [], [['text', '/api/users']], [], [], []],
-    'users_update' => [['user'], ['_controller' => 'App\\Controller\\UserController::delete'], [], [['variable', '/', '[^/]++', 'user', true], ['text', '/api/users']], [], [], []],
+    'api_users_collection' => [[], ['_controller' => 'App\\Controller\\UserController::index'], [], [['text', '/api/users']], [], [], []],
+    'api_create_user' => [[], ['_controller' => 'App\\Controller\\UserController::create'], [], [['text', '/api/users']], [], [], []],
+    'api_single_user' => [['user'], ['_controller' => 'App\\Controller\\UserController::single'], [], [['variable', '/', '[^/]++', 'user', true], ['text', '/api/users']], [], [], []],
+    'api_update_user' => [['user'], ['_controller' => 'App\\Controller\\UserController::update'], [], [['variable', '/', '[^/]++', 'user', true], ['text', '/api/users']], [], [], []],
+    'api_delete_user' => [['user'], ['_controller' => 'App\\Controller\\UserController::delete'], [], [['variable', '/', '[^/]++', 'user', true], ['text', '/api/users']], [], [], []],
+    'api_search_users' => [[], ['_controller' => 'App\\Controller\\UserController::searchUsersByEmail'], [], [['text', '/api/users/search']], [], [], []],
 ];

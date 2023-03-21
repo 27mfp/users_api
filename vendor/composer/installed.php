@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => '__root__',
-        'pretty_version' => 'dev-master',
-        'version' => 'dev-master',
-        'reference' => 'f5f15d14912a050f8541d138c5e891c8fb18bfce',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '724f06d49e78dcb6494f1620752e433e61ee7c14',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => 'dev-master',
-            'version' => 'dev-master',
-            'reference' => 'f5f15d14912a050f8541d138c5e891c8fb18bfce',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '724f06d49e78dcb6494f1620752e433e61ee7c14',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

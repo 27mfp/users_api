@@ -153,7 +153,7 @@
     <parameter key="doctrine.orm.second_level_cache.cache_configuration.class">Doctrine\ORM\Cache\CacheConfiguration</parameter>
     <parameter key="doctrine.orm.second_level_cache.regions_configuration.class">Doctrine\ORM\Cache\RegionsConfiguration</parameter>
     <parameter key="doctrine.orm.auto_generate_proxy_classes">true</parameter>
-    <parameter key="doctrine.orm.enable_lazy_ghost_objects">true</parameter>
+    <parameter key="doctrine.orm.enable_lazy_ghost_objects">false</parameter>
     <parameter key="doctrine.orm.proxy_dir">C:\Users\Miguel\Code\users_api\var\cache\dev/doctrine/orm/Proxies</parameter>
     <parameter key="doctrine.orm.proxy_namespace">Proxies</parameter>
     <parameter key="doctrine.migrations.preferred_em">null</parameter>
@@ -2198,7 +2198,7 @@
         <argument>Doctrine\ORM\EntityRepository</argument>
       </call>
       <call method="setNamingStrategy">
-        <argument type="service" id="doctrine.orm.naming_strategy.underscore_number_aware"/>
+        <argument type="service" id="doctrine.orm.naming_strategy.underscore"/>
       </call>
       <call method="setQuoteStrategy">
         <argument type="service" id="doctrine.orm.quote_strategy.default"/>
@@ -2207,7 +2207,7 @@
         <argument type="service" id="doctrine.orm.default_entity_listener_resolver"/>
       </call>
       <call method="setLazyGhostObjectEnabled">
-        <argument>true</argument>
+        <argument>false</argument>
       </call>
       <call method="setRepositoryFactory">
         <argument type="service" id="doctrine.orm.container_repository_factory"/>
@@ -2997,32 +2997,38 @@
         <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.JDhzbGq" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator._RKikmQ" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="doctrine" type="service_closure" id="doctrine"/>
+        <argument key="user" type="service_closure" id=".errored..service_locator._RKikmQ.App\Entity\User"/>
         <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.dLHYK_a" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.8IbU9zc" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="userRepository" type="service_closure" id="App\Repository\UserRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.4Z4QY6l" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\UserController::create" type="service_closure" id=".service_locator.kPUOGb8"/>
-        <argument key="App\Controller\UserController::delete" type="service_closure" id=".service_locator.JDhzbGq"/>
+        <argument key="App\Controller\UserController::delete" type="service_closure" id=".service_locator.8IbU9zc"/>
         <argument key="App\Controller\UserController::index" type="service_closure" id=".service_locator.kPUOGb8"/>
-        <argument key="App\Controller\UserController::searchUsersByEmail" type="service_closure" id=".service_locator.kPUOGb8"/>
-        <argument key="App\Controller\UserController::single" type="service_closure" id=".service_locator.kPUOGb8"/>
-        <argument key="App\Controller\UserController::update" type="service_closure" id=".service_locator.JDhzbGq"/>
+        <argument key="App\Controller\UserController::search" type="service_closure" id=".service_locator.kPUOGb8"/>
+        <argument key="App\Controller\UserController::update" type="service_closure" id=".service_locator._RKikmQ"/>
         <argument key="App\Kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="App\Kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="App\Controller\UserController:create" type="service_closure" id=".service_locator.kPUOGb8"/>
-        <argument key="App\Controller\UserController:delete" type="service_closure" id=".service_locator.JDhzbGq"/>
+        <argument key="App\Controller\UserController:delete" type="service_closure" id=".service_locator.8IbU9zc"/>
         <argument key="App\Controller\UserController:index" type="service_closure" id=".service_locator.kPUOGb8"/>
-        <argument key="App\Controller\UserController:searchUsersByEmail" type="service_closure" id=".service_locator.kPUOGb8"/>
-        <argument key="App\Controller\UserController:single" type="service_closure" id=".service_locator.kPUOGb8"/>
-        <argument key="App\Controller\UserController:update" type="service_closure" id=".service_locator.JDhzbGq"/>
+        <argument key="App\Controller\UserController:search" type="service_closure" id=".service_locator.kPUOGb8"/>
+        <argument key="App\Controller\UserController:update" type="service_closure" id=".service_locator._RKikmQ"/>
         <argument key="kernel:loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel:registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
       </argument>
@@ -3242,12 +3248,12 @@
     <service id="debug.argument_resolver.request.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver"/>
     <service id="debug.argument_resolver.session.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver"/>
     <service id="debug.argument_resolver.service.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
-      <argument type="service" id=".service_locator.dLHYK_a"/>
+      <argument type="service" id=".service_locator.4Z4QY6l"/>
     </service>
     <service id="debug.argument_resolver.default.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver"/>
     <service id="debug.argument_resolver.variadic.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver"/>
     <service id="debug.argument_resolver.not_tagged_controller.inner" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
-      <argument type="service" id=".service_locator.dLHYK_a"/>
+      <argument type="service" id=".service_locator.4Z4QY6l"/>
     </service>
     <service id=".doctrine.orm.default_metadata_driver.inner" class="Doctrine\Persistence\Mapping\Driver\MappingDriverChain">
       <call method="addDriver">
@@ -3256,6 +3262,7 @@
       </call>
     </service>
     <service id=".errored..service_locator.y4_Zrx..Symfony\Component\Config\Loader\LoaderInterface" class="Symfony\Component\Config\Loader\LoaderInterface"/>
+    <service id=".errored..service_locator._RKikmQ.App\Entity\User" class="App\Entity\User"/>
     <service id=".console.command.about.lazy" class="Symfony\Component\Console\Command\LazyCommand">
       <argument>about</argument>
       <argument type="collection"/>
@@ -3877,12 +3884,13 @@
     <service id="Twig\Environment" alias="twig"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.7nzbL4K" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.dLHYK_a"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.4Z4QY6l"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id="Psr\Log\LoggerInterface" alias="logger"/>
     <service id=".service_locator.o.uf2zi" alias=".service_locator.7nzbL4K"/>
-    <service id=".service_locator.GPNq4Yr" alias=".service_locator.dLHYK_a"/>
+    <service id=".service_locator.3Ww1xYd" alias=".service_locator._RKikmQ"/>
+    <service id=".service_locator.asfdGP7" alias=".service_locator.4Z4QY6l"/>
     <service id=".service_locator.qBCHs1a" alias=".service_locator.QXcJQkF"/>
     <service id=".service_locator.VZoQk0z" alias=".service_locator.CshazM0"/>
     <service id="event_dispatcher" alias="debug.event_dispatcher" public="true"/>
@@ -3903,7 +3911,8 @@
     <service id="doctrine.orm.default_metadata_driver" alias=".doctrine.orm.default_metadata_driver"/>
     <service id=".service_locator.gFlme_s" alias=".service_locator.y4_Zrx."/>
     <service id=".service_locator.025Wi8b" alias=".service_locator.kPUOGb8"/>
-    <service id=".service_locator.on9wXlN" alias=".service_locator.JDhzbGq"/>
+    <service id=".service_locator.VI586xz" alias=".service_locator._RKikmQ"/>
+    <service id=".service_locator.SPFAmCQ" alias=".service_locator.8IbU9zc"/>
     <service id=".service_locator.qRty2Ql" alias=".service_locator.CshazM0"/>
     <service id=".service_locator.u6DWx23" alias=".service_locator.cXsfP3P"/>
   </services>

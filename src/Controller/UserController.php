@@ -2,14 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
-use App\Repository\UserRepository;
-use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
-
+use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\UserRepository;
 
 class UserController extends AbstractController
 {
@@ -26,66 +27,18 @@ class UserController extends AbstractController
     }
 
     /* 
-    SINGLE
-    */
-
-    /*#[Route('/api/users/{id}', name: 'api_single_user', methods: ['GET'])]
-    public function single(string $user, UserRepository $userRepository): JsonResponse
-    {
-    $user = $userRepository->find($id);
-    if (!$user) {
-    throw $this->createNotFoundException(sprintf('No user found with id "%s"', $id));
-    }
-    $data = [
-    'id' => $user->getId(),
-    'name' => $user->getName(),
-    'email' => $user->getEmail(),
-    'createdAt' => $user->getCreatedAt()->format('Y-m-d H:i:s'),
-    'updatedAt' => $user->getUpdatedAt()->format('Y-m-d H:i:s'),
-    ];
-    return $this->json($data);
-    }*/
-
-    /**
-     * @Route("/api/users/{id}", name="api_get_user", methods={"GET"})
-     */
-    public function single(int $id, UserRepository $userRepository): JsonResponse
-    {
-        $user = $userRepository->find($id);
-
-        if (!$user) {
-            throw $this->createNotFoundException(sprintf('No user found with id "%s"', $id));
-        }
-
-        $data = [
-            'id' => $user->getId(),
-            'name' => $user->getName(),
-            'email' => $user->getEmail(),
-            'createdAt' => $user->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updatedAt' => $user->getUpdatedAt()->format('Y-m-d H:i:s'),
-        ];
-
-        return $this->json($data);
-    }
-
-    /* 
     CREATE
     */
 
     #[Route('/api/users', name: 'users_create', methods: ['POST'])]
     public function create(Request $request, UserRepository $userRepository): JsonResponse
     {
-
-        if ($request->headers->get('content-type') == 'application/json') {
-            $data = $request->toArray();
-        } else {
-            $data = $request->request->all();
-        }
-
+        $name = $request->request->get('name');
+        $email = $request->request->get('email');
 
         $user = new User();
-        $user->setName($data['name']);
-        $user->setEmail($data['email']);
+        $user->setName($name);
+        $user->setEmail($email);
         $user->setCreatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
         $user->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
 
@@ -97,26 +50,28 @@ class UserController extends AbstractController
         ], 201);
     }
 
+
     /* 
     UPDATE
     */
 
-    #[Route('/api/users/{id}', name: 'users_update', methods: ['PUT', 'PATCH'])]
-    public function update(int $id, Request $request, ManagerRegistry $doctrine, UserRepository $userRepository): JsonResponse
+    #[Route('/api/users/{user}', name: 'users_update', methods: ['PUT', 'PATCH'])]
+    public function update(User $user, Request $request, ManagerRegistry $doctrine, UserRepository $userRepository): JsonResponse
     {
-        $user = $userRepository->find($id);
-
-        if (!$user) {
-            throw $this->createNotFoundException();
-        }
-
         $data = $request->request->all();
 
-        $user->setName($data['name']);
-        $user->setEmail($data['email']);
+        if (isset($data['name'])) {
+            $user->setName($data['name']);
+        }
+
+        if (isset($data['email'])) {
+            $user->setEmail($data['email']);
+        }
+
         $user->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
 
-        $doctrine->getManager()->flush();
+        $entityManager = $doctrine->getManager();
+        $entityManager->flush();
 
         return $this->json([
             'message' => 'User successfully updated',
@@ -127,32 +82,19 @@ class UserController extends AbstractController
 
 
 
-
     /*
     DELETE
     */
 
-
-    /*#[Route('/api/users/{user}', name: 'users_update', methods: ['DELETE'])]
-    public function delete(int $user, Request $request, UserRepository $userRepository): JsonResponse
+    #[Route('/api/users/{email}', name: 'users_delete', methods: ['DELETE'])]
+    public function delete(string $email, EntityManagerInterface $entityManager, UserRepository $userRepository): JsonResponse
     {
-    $user = $userRepository->find($user);
-    $userRepository->remove($user, true);
-    return $this->json([
-    'data' => $user
-    ]);
-    } */
-
-    #[Route('/api/users/{id}', name: 'users_delete', methods: ['DELETE'])]
-    public function delete(int $id, ManagerRegistry $doctrine, UserRepository $userRepository): JsonResponse
-    {
-        $user = $userRepository->find($id);
+        $user = $userRepository->findOneBy(['email' => $email]);
 
         if (!$user) {
-            throw $this->createNotFoundException();
+            throw $this->createNotFoundException(sprintf('No user found with email "%s"', $email));
         }
 
-        $entityManager = $doctrine->getManager();
         $entityManager->remove($user);
         $entityManager->flush();
 
@@ -161,23 +103,28 @@ class UserController extends AbstractController
         ], 200);
     }
 
-
-    /*
-    SEARCH
+    /* 
+    SEARCH BY EMAIL
     */
 
-    #[Route('/api/users/search', name: 'api_search_users', methods: ['GET'])]
-    public function searchUsersByEmail(Request $request, UserRepository $userRepository): JsonResponse
+    #[Route('/api/users/search', name: 'users_search', methods: ['GET'])]
+    public function search(Request $request, UserRepository $userRepository): JsonResponse
     {
         $email = $request->query->get('email');
 
-        $users = $userRepository->findBy(['email' => $email]);
+        if (!$email) {
+            throw new BadRequestHttpException('Missing email parameter');
+        }
+
+        $user = $userRepository->findOneBy(['email' => $email]);
+
+        if (!$user) {
+            throw $this->createNotFoundException(sprintf('No user found with email "%s"', $email));
+        }
 
         return $this->json([
-            'data' => $users
-        ]);
+            'data' => $user,
+        ], 200);
     }
-
-
 
 }

@@ -9,22 +9,17 @@ api_create_user:
   controller: App\Controller\UserController::create
   methods: ["POST"]
 
-api_single_user:
-  path: /api/users/{id<\d+>}
-  controller: App\Controller\UserController::single
+api_search_user:
+  path: /api/users/search
+  controller: App\Controller\UserController::search
   methods: ["GET"]
 
 api_update_user:
-  path: /api/users/{id<\d+>}
+  path: /api/users/{email}
   controller: App\Controller\UserController::update
   methods: ["PUT"]
 
-api_delete_user:
-  path: /api/users/{id<\d+>}
+users_delete:
+  path: /api/users/{email}
   controller: App\Controller\UserController::delete
-  methods: ["DELETE"]
-
-api_search_users:
-  path: /api/users/search
-  controller: App\Controller\UserController::searchUsersByEmail
-  methods: ["GET"]
+  methods: [DELETE]
