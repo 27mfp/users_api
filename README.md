@@ -20,25 +20,25 @@ Clone the repository to your local machine:
 
 Install the project dependencies using Composer:
 
-    composer install
+`composer install`
 
 Create a .env.local file in the project root directory with the following contents:
 
-    DATABASE_URL=mysql://db_user:db_password@127.0.0.1:3306/users_api
+`DATABASE_URL=mysql://db_user:db_password@127.0.0.1:3306/users_api`
 
 Replace db_user and db_password with your MySQL database credentials.
 
 Create the database:
 
-    php bin/console doctrine:database:create
+`php bin/console doctrine:database:create`
 
 Run database migrations:
 
-    php bin/console doctrine:migrations:migrate
+`php bin/console doctrine:migrations:migrate`
 
 Start the Symfony server:
 
-    symfony server:start
+`symfony server:start`
 
 The API should now be accessible at http://localhost:8000.
 
