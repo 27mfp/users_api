@@ -44,4 +44,4 @@ The objective of this project is to provide an API that allows users to perform 
 
 # Conclusion
 
-    This API provides a simple way to manage a database of users. The endpoints provided allow users to perform CRUD operations on the database, making it easy to create, read, update, and delete user data.
+This API provides a simple way to manage a database of users. The endpoints provided allow users to perform CRUD operations on the database, making it easy to create, read, update, and delete user data.
