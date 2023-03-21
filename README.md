@@ -1,46 +1,74 @@
-# User Management API
+# Users API
 
-This API allows users to manage a database of users.
+    This is a simple API built with Symfony that allows users to be created, read, updated, and deleted. The API stores user data in a MySQL database.
 
-## Objective
+# Requirements
 
-The objective of this project is to provide an API that allows users to perform CRUD (Create, Read, Update, Delete) operations on a database of users.
+    To run this API, you will need:
 
-# Endpoints
+    PHP 7.4 or later
+    Composer
+    MySQL 5.7 or later
 
-## The following endpoints are available:
+# Installation
 
-### List all users
+To install the API, follow these steps:
+Clone the repository to your local machine:
 
-    GET /api/users
-    This endpoint returns a list of all users in the database.
+    git clone https://github.com/27mfp/users_api.git
 
-### Create a new user
+Install the project dependencies using Composer:
 
-    POST /api/users
-    This endpoint allows the creation of a new user. The request must include the following parameters:
+    composer install
 
-    name: The name of the user.
-    email: The email address of the user.
+Create a .env.local file in the project root directory with the following contents:
 
-### Update an existing user
+    DATABASE_URL=mysql://db_user:db_password@127.0.0.1:3306/users_api
 
-    PUT /api/users/{user}
-    PATCH /api/users/{user}
-    This endpoint allows the updating of an existing user. The request must include the following parameters:
+Replace db_user and db_password with your MySQL database credentials.
 
-    name: The name of the user.
-    email: The email address of the user.
+Create the database:
 
-### Delete a user
+    php bin/console doctrine:database:create
 
-    DELETE /api/users/{email}
-    This endpoint allows the deletion of an existing user. The request must include the email address of the user to be deleted.
+Run database migrations:
 
-### Search for a user
+    php bin/console doctrine:migrations:migrate
 
-    GET /api/users/search?email={email}
-    This endpoint allows the searching of a user by email address. The request must include the email address of the user to be searched for in the query parameter email.
+Start the Symfony server:
+
+    symfony server:start
+
+The API should now be accessible at http://localhost:8000.
+
+# Usage
+
+The API has the following endpoints:
+
+    GET /users - Get a list of all users
+    POST /users - Create a new user
+
+This endpoint allows the creation of a new user. The request must include the following parameters:
+name: The name of the user.
+email: The email address of the user.
+
+    GET /users/{email} - Get a specific user by email
+
+This endpoint allows the searching of a user by email address. The request must include the email address of the user to be searched for in the query parameter email.
+
+    PUT /users/{emailid} - Update a specific user by email
+
+This endpoint allows the updating of an existing user. The request must include the following parameters:
+name: The name of the user.
+email: The email address of the user.
+
+    DELETE /users/{email} - Delete a specific user by email
+
+This endpoint allows the deletion of an existing user. The request must include the email address of the user to be deleted.
+
+To use the API, send HTTP requests to the appropriate endpoint using a tool like curl, Postman, or a web browser. For example, to create a new user using curl, you could run:
+
+    curl -X POST -H "Content-Type: application/json" -d '{"name": "John Smith", "email": "john.smith@example.com"}' http://localhost:8000/users
 
 # Conclusion
 
