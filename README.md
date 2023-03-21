@@ -16,7 +16,7 @@ This is a simple API built with Symfony that allows users to be created, read, u
 
 Clone the repository to your local machine:
 
-    git clone https://github.com/27mfp/users_api.git
+`git clone https://github.com/27mfp/users_api.git`
 
 Install the project dependencies using Composer:
 
@@ -55,15 +55,13 @@ This endpoint allows the creation of a new user. The request must include the fo
 name: The name of the user.
 email: The email address of the user.
 
-### This endpoint allows the searching of a user by email address. The request must include the email address of the user to be searched for in the query parameter email.
+This endpoint allows the searching of a user by email address. The request must include the email address of the user to be searched for in the query parameter email.
 
     GET /users/{email} - Get a specific user by email
 
-### This endpoint allows the updating of an existing user. The request must include the following parameters:
-
-### name: The name of the user.
-
-### email: The email address of the user.
+This endpoint allows the updating of an existing user. The request must include the following parameters:
+name: The name of the user.
+email: The email address of the user.
 
     PUT /users/{emailid} - Update a specific user by email
 
