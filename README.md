@@ -12,7 +12,7 @@ This is a simple API built with Symfony that allows users to be created, read, u
 
 # Installation
 
-To install the API, follow these steps:
+### To install the API, follow these steps:
 
 Clone the repository to your local machine:
 
@@ -44,7 +44,9 @@ The API should now be accessible at http://localhost:8000.
 
 # Usage
 
-The API has the following endpoints:
+### The API has the following endpoints:
+
+### 1
 
     GET /users - Get a list of all users
     POST /users - Create a new user
@@ -53,15 +55,21 @@ This endpoint allows the creation of a new user. The request must include the fo
 name: The name of the user.
 email: The email address of the user.
 
+### 2
+
     GET /users/{email} - Get a specific user by email
 
 This endpoint allows the searching of a user by email address. The request must include the email address of the user to be searched for in the query parameter email.
+
+### 3
 
     PUT /users/{emailid} - Update a specific user by email
 
 This endpoint allows the updating of an existing user. The request must include the following parameters:
 name: The name of the user.
 email: The email address of the user.
+
+### 4
 
     DELETE /users/{email} - Delete a specific user by email
 
