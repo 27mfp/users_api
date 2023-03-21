@@ -243,3 +243,12 @@ $classes[] = 'Symfony\Bridge\Twig\Extension\SerializerRuntime';
 $classes[] = 'Symfony\Component\HttpKernel\EventListener\ValidateRequestListener';
 
 $preloaded = Preloader::preload($classes);
+require_once __DIR__.'/twig/dc/dc04d516fc932bb77ec042bb3a8bd4e2.php';
+require_once __DIR__.'/twig/eb/eb2f5bddab5bab9940463a1823906eb5.php';
+require_once __DIR__.'/twig/f9/f9dee1881b94c10c7a65fd6d8d39abb5.php';
+require_once __DIR__.'/twig/63/63acff31556cde7726cf15d5c2501cf8.php';
+
+$classes = [];
+$classes[] = 'Symfony\\Component\\Routing\\Generator\\CompiledUrlGenerator';
+$classes[] = 'Symfony\\Bundle\\FrameworkBundle\\Routing\\RedirectableCompiledUrlMatcher';
+$preloaded = Preloader::preload($classes, $preloaded);

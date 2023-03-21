@@ -16,6 +16,6 @@ if (!\class_exists(App_KernelDevDebugContainer::class, false)) {
 
 return new \ContainerWbuigXE\App_KernelDevDebugContainer([
     'container.build_hash' => 'WbuigXE',
-    'container.build_id' => 'ce19cece',
-    'container.build_time' => 1679395799,
+    'container.build_id' => '615fb84a',
+    'container.build_time' => 1679417197,
 ], __DIR__.\DIRECTORY_SEPARATOR.'ContainerWbuigXE');
