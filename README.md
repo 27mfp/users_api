@@ -13,6 +13,7 @@ This is a simple API built with Symfony that allows users to be created, read, u
 # Installation
 
 To install the API, follow these steps:
+
 Clone the repository to your local machine:
 
     git clone https://github.com/27mfp/users_api.git
