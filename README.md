@@ -1,10 +1,10 @@
 # Users API
 
-    This is a simple API built with Symfony that allows users to be created, read, updated, and deleted. The API stores user data in a MySQL database.
+This is a simple API built with Symfony that allows users to be created, read, updated, and deleted. The API stores user data in a MySQL database.
 
 # Requirements
 
-    To run this API, you will need:
+## To run this API, you will need:
 
     PHP 7.4 or later
     Composer
