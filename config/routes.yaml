@@ -23,10 +23,3 @@ users_delete:
   path: /api/users/{email}
   controller: App\Controller\UserController::delete
   methods: [DELETE]
-
-# config/routes.yaml
-
-# the "app_lucky_number" route name is not important yet
-app_lucky_number:
-  path: /lucky/number
-  controller: App\Controller\LuckyController::number
