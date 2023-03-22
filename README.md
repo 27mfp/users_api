@@ -53,7 +53,7 @@ This endpoint allows the creation of a new user. The request must include the fo
 name: The name of the user.
 email: The email address of the user.
 
-    GET /users/{email} - Get a specific user by email
+    GET /users/search?email={email} - Get a specific user by email
 
 This endpoint allows the searching of a user by email address. The request must include the email address of the user to be searched for in the query parameter email.
 
