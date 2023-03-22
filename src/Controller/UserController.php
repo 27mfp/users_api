@@ -33,8 +33,10 @@ class UserController extends AbstractController
     #[Route('/api/users', name: 'users_create', methods: ['POST'])]
     public function create(Request $request, UserRepository $userRepository): JsonResponse
     {
-        $name = $request->request->get('name');
-        $email = $request->request->get('email');
+        $requestData = json_decode($request->getContent(), true);
+
+        $name = $requestData['name'];
+        $email = $requestData['email'];
 
         $user = new User();
         $user->setName($name);
@@ -51,6 +53,7 @@ class UserController extends AbstractController
     }
 
 
+
     /* 
     UPDATE
     */
@@ -58,14 +61,14 @@ class UserController extends AbstractController
     #[Route('/api/users/{user}', name: 'users_update', methods: ['PUT', 'PATCH'])]
     public function update(User $user, Request $request, ManagerRegistry $doctrine, UserRepository $userRepository): JsonResponse
     {
-        $data = $request->request->all();
+        $requestData = json_decode($request->getContent(), true);
 
-        if (isset($data['name'])) {
-            $user->setName($data['name']);
+        if (isset($requestData['name'])) {
+            $user->setName($requestData['name']);
         }
 
-        if (isset($data['email'])) {
-            $user->setEmail($data['email']);
+        if (isset($requestData['email'])) {
+            $user->setEmail($requestData['email']);
         }
 
         $user->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
@@ -78,6 +81,7 @@ class UserController extends AbstractController
             'data' => $user,
         ], 201);
     }
+
 
 
 
