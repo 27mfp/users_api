@@ -1,0 +1,266 @@
+Sure, I can help you with that! Here's an example implementation of API key authentication in Symfony 6:
+
+    Create a new table in your database to store API keys. The table should have at least two columns: id and key. You can also add additional columns as needed, such as a user_id column if you want to associate API keys with specific users.
+
+    Create a new entity class to represent API keys. Here's an example:
+
+php
+
+namespace App\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\ApiKeyRepository")
+ */
+class ApiKey
+{
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", length=255, unique=true)
+     */
+    private $key;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getKey(): ?string
+    {
+        return $this->key;
+    }
+
+    public function setKey(string $key): self
+    {
+        $this->key = $key;
+
+        return $this;
+    }
+}
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   Create a new repository class for the ApiKey entity. Here's an example:
+
+php
+
+namespace App\Repository;
+
+use App\Entity\ApiKey;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+
+class ApiKeyRepository extends ServiceEntityRepository
+{
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, ApiKey::class);
+    }
+
+    public function findByKey(string $key): ?ApiKey
+    {
+        return $this->findOneBy(['key' => $key]);
+    }
+}
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ Create a new authentication guard that will check for API keys in the Authorization header of incoming requests. Here's an example:
+
+php
+
+namespace App\Security;
+
+use App\Repository\ApiKeyRepository;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Guard\Authenticator\AbstractGuardAuthenticator;
+
+class ApiKeyAuthenticator extends AbstractGuardAuthenticator
+{
+    private $apiKeyRepository;
+
+    public function __construct(ApiKeyRepository $apiKeyRepository)
+    {
+        $this->apiKeyRepository = $apiKeyRepository;
+    }
+
+    public function supports(Request $request): bool
+    {
+        return $request->headers->has('Authorization');
+    }
+
+    public function getCredentials(Request $request): string
+    {
+        $apiKey = $request->headers->get('Authorization');
+
+        return str_replace('Bearer ', '', $apiKey);
+    }
+
+    public function getUser($credentials, UserProviderInterface $userProvider): ?UserInterface
+    {
+        $apiKey = $this->apiKeyRepository->findByKey($credentials);
+
+        if (!$apiKey) {
+            throw new CustomUserMessageAuthenticationException('Invalid API key.');
+        }
+
+        return $apiKey;
+    }
+
+    public function checkCredentials($credentials, UserInterface $user): bool
+    {
+        return true;
+    }
+
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
+    {
+        return new Response('Authentication failed.', 401);
+    }
+
+    public function onAuthenticationSuccess(Request $request, $token, string $providerKey): ?Response
+    {
+        return null;
+    }
+
+    public function start(Request $request, AuthenticationException $authException = null): Response
+    {
+        return new Response('Authentication')
+    }
+    
+    public function supportsRememberMe(): bool
+    {
+        return false;
+    }
+}
+
+    
+
+
+
+
+
+
+
+
+
+Create a new service for the ApiKeyAuthenticator class. Here's an example:
+
+yaml
+
+# config/services.yaml
+
+services:
+    App\Security\ApiKeyAuthenticator:
+        arguments:
+            $apiKeyRepository: '@App\Repository\ApiKeyRepository'
+
+    
+
+
+
+
+
+
+
+
+
+
+Configure the authentication system to use the new ApiKeyAuthenticator guard. Here's an example:
+
+yaml
+
+# config/packages/security.yaml
+
+security:
+    # ...
+
+    firewalls:
+        api:
+            pattern: ^/api
+            stateless: true
+            guard:
+                authenticators:
+                    - App\Security\ApiKeyAuthenticator
+
+This configuration sets up a new firewall that will apply to all URLs starting with /api, and specifies that the firewall should be stateless (i.e., not maintain any session state). The guard section specifies that the ApiKeyAuthenticator should be used to authenticate requests to this firewall.
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  Finally, you can use the @Security annotation to restrict access to specific controller actions or entire controllers based on the presence of a valid API key. Here's an example:
+
+php
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+
+class ApiController extends AbstractController
+{
+    /**
+     * @Route("/api/users", name="api_users")
+     * @Security("is_granted('ROLE_API_USER')")
+     */
+    public function users()
+    {
+        // ...
+    }
+}
+
+This example restricts access to the /api/users endpoint to users who have the ROLE_API_USER role, which you can define and assign to specific API keys in your database.
