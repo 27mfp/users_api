@@ -47,6 +47,7 @@ The API should now be accessible at http://localhost:8000.
 ### The API has the following endpoints:
 
     GET api/users - Get a list of all users
+   # 
     POST api/users - Create a new user
 
 This endpoint allows the creation of a new user. The request must include the following parameters:
