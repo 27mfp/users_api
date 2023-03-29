@@ -1,25 +1,25 @@
 # routes.yaml
 api_users_collection:
-  path: /api/users
+  path: public/api/users
   controller: App\Controller\UserController::index
   methods: ["GET"]
 
 api_create_user:
-  path: /api/users
+  path: public/api/users
   controller: App\Controller\UserController::create
   methods: ["POST"]
 
 api_search_user:
-  path: /api/users/search
+  path: public/api/users/search
   controller: App\Controller\UserController::search
   methods: ["GET"]
 
 api_update_user:
-  path: /api/users/{email}
+  path: public/api/users/{email}
   controller: App\Controller\UserController::update
   methods: ["PUT"]
 
 users_delete:
-  path: /api/users/{email}
+  path: public/api/users/{email}
   controller: App\Controller\UserController::delete
   methods: [DELETE]
