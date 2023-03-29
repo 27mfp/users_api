@@ -37,12 +37,23 @@ class UserController extends AbstractController
 
         $name = $requestData['name'];
         $email = $requestData['email'];
+        $birthdate = $requestData['birthdate'];
+        $bio = $requestData['bio'];
+        $city = $requestData['city'];
+        $admin = $requestData['admin'];
+        $role = $requestData['role'];
+
 
         $user = new User();
         $user->setName($name);
         $user->setEmail($email);
         $user->setCreatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
         $user->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
+        $user->setBirthdate($birthdate);
+        $user->setBio($bio);
+        $user->setCity($city);
+        $user->setAdmin($admin);
+        $user->setRole($role);
 
         $userRepository->add($user, true);
 
@@ -69,6 +80,10 @@ class UserController extends AbstractController
 
         if (isset($requestData['email'])) {
             $user->setEmail($requestData['email']);
+        }
+
+        if (isset($requestData['birthdate'])) {
+            $user->setBirthdate($requestData['birthdate']);
         }
 
         $user->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));

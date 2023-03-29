@@ -26,6 +26,21 @@ class User
     #[ORM\Column]
     private ?\DateTimeImmutable $updated_at = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $birthdate = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $bio = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $city = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $role = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $admin = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +90,67 @@ class User
     public function setUpdatedAt(\DateTimeImmutable $updated_at): self
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getBirthdate(): ?string
+    {
+        return $this->birthdate;
+    }
+
+    public function setBirthdate(string $birthdate): self
+    {
+        $this->birthdate = $birthdate;
+
+        return $this;
+    }
+
+    public function getBio(): ?string
+    {
+        return $this->bio;
+    }
+
+    public function setBio(string $bio): self
+    {
+        $this->bio = $bio;
+
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(string $city): self
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    public function getAdmin(): ?string
+    {
+        return $this->admin;
+    }
+
+    public function setAdmin(string $admin): self
+    {
+        $this->admin = $admin;
+
+        return $this;
+    }
+
+
+    public function getRole(): ?string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): self
+    {
+        $this->role = $role;
 
         return $this;
     }
