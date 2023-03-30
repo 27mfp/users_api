@@ -1,21 +1,31 @@
 version: '3'
 
 services:
-###> doctrine/doctrine-bundle ###
   database:
-    image: postgres:${POSTGRES_VERSION:-15}-alpine
+    image: mariadb
+    restart: unless-stopped
+    container_name: database_users_api
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-users_api}
+      MARIADB_USER: ${MARIADB_USER:-user}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-pass}
+      MARIADB_RANDOM_ROOT_PASSWORD: ${MARIADB_RANDOM_ROOT_PASSWORD:-yes}
     volumes:
-      - database_data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - ./database_data:/var/lib/mysql:rw
+    ports:
+      - '3307:3306'
 
-volumes:
-###> doctrine/doctrine-bundle ###
-  database_data:
-###< doctrine/doctrine-bundle ###
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    container_name: adminer_users_api
+    environment:
+      - ADMINER_DEFAULT_DB_DRIVER=mysql
+      - ADMINER_DEFAULT_DB_HOST=mariadb
+      - ADMINER_DEFAULT_DB_NAME=adminer
+      - ADMINER_DEFAULT_SERVER=users_api
+      - ADMINER_DESIGN=nette
+    ports:
+      - '8002:8080'
+    depends_on:
+      - database

@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: "users_table")]
+#[ORM\Table(name: 'users_table')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -22,29 +25,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private string $email;
 
-    #[ORM\Column]
-    private \DateTimeImmutable $created_at;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private \DateTimeInterface $created_at;
 
-    #[ORM\Column]
-    private \DateTimeImmutable $updated_at;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private \DateTimeInterface $updated_at;
 
     #[ORM\Column(length: 255)]
     private string $birthdate;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 20)]
+    private string $phoneNumber;
+
+    #[ORM\Column(length: 255,nullable: true)]
     private ?string $bio = null;
 
     #[ORM\Column(length: 255)]
     private string $city;
-
-    #[ORM\Column(length: 255)]
-    private string $admin;
-
     #[ORM\Column]
     private array $roles = [];
 
     #[ORM\Column]
     private string $password;
+
+    public function __construct()
+    {
+        $this->created_at = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -56,7 +63,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): static
     {
         $this->name = $name;
 
@@ -68,31 +75,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): self
+    public function setEmail(string $email): static
     {
         $this->email = $email;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): self
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): \DateTimeInterface
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updated_at): self
+    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
     {
         $this->updated_at = $updated_at;
 
@@ -104,19 +104,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->birthdate;
     }
 
-    public function setBirthdate(string $birthdate): self
+    public function setBirthdate(string $birthdate): static
     {
         $this->birthdate = $birthdate;
 
         return $this;
     }
 
+    public function getPhoneNumber(): string
+    {
+        return $this->phoneNumber;
+    }
+
+    public function setPhoneNumber(string $phoneNumber): static
+    {
+        $this->phoneNumber = $phoneNumber;
+        return $this;
+    }
+
+
+
     public function getBio(): ?string
     {
         return $this->bio;
     }
 
-    public function setBio(string $bio): self
+    public function setBio(string $bio): static
     {
         $this->bio = $bio;
 
@@ -128,25 +141,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->city;
     }
 
-    public function setCity(string $city): self
+    public function setCity(string $city): static
     {
         $this->city = $city;
 
         return $this;
     }
-
-    public function getAdmin(): ?string
-    {
-        return $this->admin;
-    }
-
-    public function setAdmin(string $admin): self
-    {
-        $this->admin = $admin;
-
-        return $this;
-    }
-
 
     public function getRoles(): array
     {
@@ -156,16 +156,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
-    public function setRoles(array $roles): self
+    public function setRoles(array $roles): static
     {
         $this->roles = $roles;
 
         return $this;
     }
+
     public function getPassword(): string
     {
         return $this->password;
     }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+        return $this;
+    }
+
+
 
     public function getUserIdentifier(): string
     {
@@ -177,5 +186,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
     }
-
 }
