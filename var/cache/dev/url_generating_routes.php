@@ -8,5 +8,5 @@ return [
     'api_create_user' => [[], ['_controller' => 'App\\Controller\\UserController::create'], [], [['text', '/api/users']], [], [], []],
     'api_search_user' => [[], ['_controller' => 'App\\Controller\\UserController::search'], [], [['text', '/api/users/search']], [], [], []],
     'api_update_user' => [['email'], ['_controller' => 'App\\Controller\\UserController::update'], [], [['variable', '/', '[^/]++', 'email', true], ['text', '/api/users']], [], [], []],
-    'users_delete' => [['email'], ['_controller' => 'App\\Controller\\UserController::delete'], [], [['variable', '/', '[^/]++', 'email', true], ['text', '/api/users']], [], [], []],
+    'api_delete_user' => [['email'], ['_controller' => 'App\\Controller\\UserController::delete'], [], [['variable', '/', '[^/]++', 'email', true], ['text', '/api/users']], [], [], []],
 ];

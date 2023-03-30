@@ -86,6 +86,22 @@ class UserController extends AbstractController
             $user->setBirthdate($requestData['birthdate']);
         }
 
+        if (isset($requestData['bio'])) {
+            $user->setBio($requestData['bio']);
+        }
+
+        if (isset($requestData['city'])) {
+            $user->setCity($requestData['city']);
+        }
+
+        if (isset($requestData['admin'])) {
+            $user->setAdmin($requestData['admin']);
+        }
+
+        if (isset($requestData['role'])) {
+            $user->setRole($requestData['role']);
+        }
+
         $user->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
 
         $entityManager = $doctrine->getManager();
