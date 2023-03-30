@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\User;
@@ -21,7 +23,7 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
-    public function add(User $entity, bool $flush = false): void
+    public function save(User $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -45,7 +47,8 @@ class UserRepository extends ServiceEntityRepository
             ->andWhere('u.email = :email')
             ->setParameter('email', $email)
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
     }
 //    /**
 //     * @return User[] Returns an array of User objects
