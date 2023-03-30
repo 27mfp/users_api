@@ -14,31 +14,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private string $name;
 
     #[ORM\Column(length: 255)]
-    private ?string $email = null;
+    private string $email;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+    private \DateTimeImmutable $created_at;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $updated_at = null;
+    private \DateTimeImmutable $updated_at;
 
     #[ORM\Column(length: 255)]
-    private ?string $birthdate = null;
+    private string $birthdate;
 
     #[ORM\Column(length: 255)]
     private ?string $bio = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $city = null;
+    private string $city;
 
     #[ORM\Column(length: 255)]
-    private ?string $admin = null;
+    private string $admin;
 
     #[ORM\Column]
     private array $roles = [];
@@ -156,13 +156,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
-    public function setRole(string $role): self
+    public function setRoles(array $roles): self
     {
-        $this->role = $role;
+        $this->roles = $roles;
 
         return $this;
     }
-
     public function getPassword(): string
     {
         return $this->password;

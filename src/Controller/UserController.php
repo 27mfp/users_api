@@ -41,7 +41,7 @@ class UserController extends AbstractController
         $bio = $requestData['bio'];
         $city = $requestData['city'];
         $admin = $requestData['admin'];
-        $role = $requestData['role'];
+        $roles = $requestData['roles'];
 
 
         $user = new User();
@@ -53,7 +53,7 @@ class UserController extends AbstractController
         $user->setBio($bio);
         $user->setCity($city);
         $user->setAdmin($admin);
-        $user->setRole($role);
+        $user->setRoles($roles);
 
         $userRepository->add($user, true);
 
@@ -98,8 +98,8 @@ class UserController extends AbstractController
             $user->setAdmin($requestData['admin']);
         }
 
-        if (isset($requestData['role'])) {
-            $user->setRole($requestData['role']);
+        if (isset($requestData['roles'])) {
+            $user->setRoles($requestData['roles']);
         }
 
         $user->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
