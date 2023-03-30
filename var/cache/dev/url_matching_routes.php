@@ -26,7 +26,7 @@ return [
         35 => [[['_route' => '_preview_error', '_controller' => 'error_controller::preview', '_format' => 'html'], ['code', '_format'], null, null, false, true, null]],
         64 => [
             [['_route' => 'api_update_user', '_controller' => 'App\\Controller\\UserController::update'], ['email'], ['PUT' => 0], null, false, true, null],
-            [['_route' => 'users_delete', '_controller' => 'App\\Controller\\UserController::delete'], ['email'], ['DELETE' => 0], null, false, true, null],
+            [['_route' => 'api_delete_user', '_controller' => 'App\\Controller\\UserController::delete'], ['email'], ['DELETE' => 0], null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],
     ],
