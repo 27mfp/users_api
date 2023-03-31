@@ -42,7 +42,6 @@ class UserController extends AbstractController
         $city = $requestData['city'];
         $password = $requestData['password'];
         $phonenumber = $requestData['phonenumber'];
-        $roles = $requestData['roles'];
 
 
         $user = new User();
@@ -117,10 +116,6 @@ class UserController extends AbstractController
             'data' => $user,
         ], 201);
     }
-
-
-
-
 
     /*
     DELETE
