@@ -40,7 +40,8 @@ class UserController extends AbstractController
         $birthdate = $requestData['birthdate'];
         $bio = $requestData['bio'];
         $city = $requestData['city'];
-        $admin = $requestData['admin'];
+        $password = $requestData['password'];
+        $phonenumber = $requestData['phonenumber'];
         $roles = $requestData['roles'];
 
 
@@ -52,8 +53,10 @@ class UserController extends AbstractController
         $user->setBirthdate($birthdate);
         $user->setBio($bio);
         $user->setCity($city);
-        $user->setAdmin($admin);
-        $user->setRoles($roles);
+        $user->setPassword($password);
+        $user->setphonenumber($phonenumber);
+        $user->setRoles(['']);
+
 
         $userRepository->add($user, true);
 
@@ -62,8 +65,6 @@ class UserController extends AbstractController
             'data' => $user,
         ], 201);
     }
-
-
 
     /* 
     UPDATE
@@ -94,8 +95,12 @@ class UserController extends AbstractController
             $user->setCity($requestData['city']);
         }
 
-        if (isset($requestData['admin'])) {
-            $user->setAdmin($requestData['admin']);
+        if (isset($requestData['password'])) {
+            $user->setPassword($requestData['password']);
+        }
+
+        if (isset($requestData['phonenumber'])) {
+            $user->setphonenumber($requestData['phonenumber']);
         }
 
         if (isset($requestData['roles'])) {

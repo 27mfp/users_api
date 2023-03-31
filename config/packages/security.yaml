@@ -1,0 +1,25 @@
+#config/packages/security.yaml
+
+security:
+  password_hashers:
+    Symfony\Component\Security\Core\User\InMemoryUser: plaintext
+
+  providers:
+    users_in_memory:
+      memory:
+        users:
+          api: { password: "%env(BASIC_USER_PASSWORD)%", roles: ["ROLE_USER"] }
+          admin:
+            { password: "%env(BASIC_ADMIN_PASSWORD)%", roles: ["ROLE_ADMIN"] }
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+    main:
+      lazy: true
+      provider: users_in_memory
+      http_basic:
+        realm: Secured Area
+
+  access_control:
+    - { path: ^/api/users, roles: ROLE_ADMIN }

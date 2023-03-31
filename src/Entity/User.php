@@ -9,18 +9,21 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: "users_table")]
+/**
+ * Summary of User
+ */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private int $id;
+    #[ORM\Column(type: 'integer')]
+    private $id;
 
-    #[ORM\Column(length: 255)]
-    private string $name;
+    #[ORM\Column(type: 'string', length: 255)]
+    private $name;
 
-    #[ORM\Column(length: 255)]
-    private string $email;
+    #[ORM\Column(type: 'string', length: 255, unique: 'true')]
+    private $email;
 
     #[ORM\Column]
     private \DateTimeImmutable $created_at;
@@ -28,23 +31,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private \DateTimeImmutable $updated_at;
 
-    #[ORM\Column(length: 255)]
-    private string $birthdate;
+    #[ORM\Column(type: 'string', length: 255)]
+    private $birthdate;
 
-    #[ORM\Column(length: 255)]
-    private ?string $bio = null;
+    #[ORM\Column(type: 'string', length: 255)]
+    private $bio = null;
 
-    #[ORM\Column(length: 255)]
-    private string $city;
+    #[ORM\Column(type: 'string', length: 255)]
+    private $city;
 
-    #[ORM\Column(length: 255)]
-    private string $admin;
+    #[ORM\Column(type: 'json')]
+    private $roles = [];
 
-    #[ORM\Column]
-    private array $roles = [];
+    #[ORM\Column(type: 'string', length: 255)]
+    private $password;
 
-    #[ORM\Column]
-    private string $password;
+    #[ORM\Column(type: 'integer')]
+    private $phonenumber;
 
     public function getId(): ?int
     {
@@ -135,23 +138,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getAdmin(): ?string
-    {
-        return $this->admin;
-    }
-
-    public function setAdmin(string $admin): self
-    {
-        $this->admin = $admin;
-
-        return $this;
-    }
-
-
     public function getRoles(): array
     {
         $roles = $this->roles;
-        $roles[] = 'ROLE_USER';
+        $roles[] = '';
 
         return array_unique($roles);
     }
@@ -162,10 +152,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-    public function getPassword(): string
+
+    public function getPassword(): ?string
     {
         return $this->password;
     }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    public function getPhonenumber(): ?int
+    {
+        return $this->phonenumber;
+    }
+
+    public function setPhonenumber(int $phonenumber): self
+    {
+        $this->phonenumber = $phonenumber;
+
+        return $this;
+    }
+
 
     public function getUserIdentifier(): string
     {
@@ -177,5 +188,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
     }
-
 }
