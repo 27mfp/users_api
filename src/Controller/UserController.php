@@ -1,24 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\User;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\UserRepository;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
+#[Route('/api', name: 'api_', methods: ['GET'])]
 class UserController extends AbstractController
 {
-    /* 
+
+    #[Route('/login',name: 'login',methods: ['POST'])]
+    public function login()
+    {
+        return new JsonResponse("connected");
+    }
+    /*
     LIST
     */
 
-    #[Route('/api/users', name: 'users_list', methods: ['GET'])]
+    #[Route('/users', name: 'users_list', methods: ['GET'])]
     public function index(UserRepository $userRepository): JsonResponse
     {
         return $this->json([
@@ -26,38 +40,28 @@ class UserController extends AbstractController
         ]);
     }
 
-    /* 
+    /*
     CREATE
     */
 
-    #[Route('/api/users', name: 'users_create', methods: ['POST'])]
-    public function create(Request $request, UserRepository $userRepository): JsonResponse
-    {
-        $requestData = json_decode($request->getContent(), true);
+    #[Route('/users', name: 'users_create', methods: ['POST'])]
+    public function create(
+        Request $request,
+        UserRepository $userRepository,
+        UserPasswordHasherInterface $passwordHasher
+    ): JsonResponse {
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+        $serializer = new Serializer($normalizers, $encoders);
 
-        $name = $requestData['name'];
-        $email = $requestData['email'];
-        $birthdate = $requestData['birthdate'];
-        $bio = $requestData['bio'];
-        $city = $requestData['city'];
-        $password = $requestData['password'];
-        $phonenumber = $requestData['phonenumber'];
+        /** @var \App\Entity\User $user */
+        $user = $serializer->deserialize($request->getContent(), User::class, 'json');
 
+        $user->setUpdatedAt(new \DateTimeImmutable());
 
-        $user = new User();
-        $user->setName($name);
-        $user->setEmail($email);
-        $user->setCreatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
-        $user->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
-        $user->setBirthdate($birthdate);
-        $user->setBio($bio);
-        $user->setCity($city);
-        $user->setPassword($password);
-        $user->setphonenumber($phonenumber);
-        $user->setRoles(['']);
+        $user->setPassword($passwordHasher->hashPassword($user,$user->getPassword()));
 
-
-        $userRepository->add($user, true);
+        $userRepository->save($user, true);
 
         return $this->json([
             'message' => 'User successfully created',
@@ -65,13 +69,17 @@ class UserController extends AbstractController
         ], 201);
     }
 
-    /* 
+    /*
     UPDATE
     */
 
-    #[Route('/api/users/{user}', name: 'users_update', methods: ['PUT', 'PATCH'])]
-    public function update(User $user, Request $request, ManagerRegistry $doctrine, UserRepository $userRepository): JsonResponse
-    {
+    #[Route('/users/{user}', name: 'users_update', methods: ['PUT', 'PATCH'])]
+    public function update(
+        User $user,
+        Request $request,
+        ManagerRegistry $doctrine,
+        UserRepository $userRepository
+    ): JsonResponse {
         $requestData = json_decode($request->getContent(), true);
 
         if (isset($requestData['name'])) {
@@ -94,12 +102,8 @@ class UserController extends AbstractController
             $user->setCity($requestData['city']);
         }
 
-        if (isset($requestData['password'])) {
-            $user->setPassword($requestData['password']);
-        }
-
-        if (isset($requestData['phonenumber'])) {
-            $user->setphonenumber($requestData['phonenumber']);
+        if (isset($requestData['admin'])) {
+            $user->setAdmin($requestData['admin']);
         }
 
         if (isset($requestData['roles'])) {
@@ -121,9 +125,12 @@ class UserController extends AbstractController
     DELETE
     */
 
-    #[Route('/api/users/{email}', name: 'users_delete', methods: ['DELETE'])]
-    public function delete(string $email, EntityManagerInterface $entityManager, UserRepository $userRepository): JsonResponse
-    {
+    #[Route('/users/{email}', name: 'users_delete', methods: ['DELETE'])]
+    public function delete(
+        string $email,
+        EntityManagerInterface $entityManager,
+        UserRepository $userRepository
+    ): JsonResponse {
         $user = $userRepository->findOneBy(['email' => $email]);
 
         if (!$user) {
@@ -138,11 +145,11 @@ class UserController extends AbstractController
         ], 200);
     }
 
-    /* 
+    /*
     SEARCH BY EMAIL
     */
 
-    #[Route('/api/users/search', name: 'users_search', methods: ['GET'])]
+    #[Route('/users/search', name: 'users_search', methods: ['GET'])]
     public function search(Request $request, UserRepository $userRepository): JsonResponse
     {
         $email = $request->query->get('email');
@@ -161,5 +168,4 @@ class UserController extends AbstractController
             'data' => $user,
         ], 200);
     }
-
 }
