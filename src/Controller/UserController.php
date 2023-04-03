@@ -13,21 +13,15 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api', name: 'api_', methods: ['GET'])]
 class UserController extends AbstractController
 {
-
-    #[Route('/login', name: 'login', methods: ['POST'])]
-    public function login()
-    {
-        return new JsonResponse("connected");
-    }
     /*
     LIST
     */
@@ -48,36 +42,61 @@ class UserController extends AbstractController
     public function create(
         Request $request,
         UserRepository $userRepository,
+        EntityManagerInterface $entityManager
     ): JsonResponse {
         $encoders = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
         $serializer = new Serializer($normalizers, $encoders);
 
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'];
+
+        if ($userRepository->findOneBy(['email' => $email])) {
+            return $this->json([
+                'message' => sprintf('User with email: %s already exists', $email),
+            ], Response::HTTP_CONFLICT);
+        }
+
         /** @var \App\Entity\User $user */
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
-
         $user->setUpdatedAt(new \DateTimeImmutable());
-
-        $userRepository->save($user, true);
+        $entityManager->persist($user);
+        $entityManager->flush();
 
         return $this->json([
             'message' => 'User successfully created',
             'data' => $user,
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
+
 
     /*
     UPDATE
     */
 
-    #[Route('/users/{user}', name: 'users_update', methods: ['PUT', 'PATCH'])]
+    #[Route('/users/{email}', name: 'users_update', methods: ['PUT', 'PATCH'])]
     public function update(
-        User $user,
+        string $email,
         Request $request,
-        ManagerRegistry $doctrine,
-        UserRepository $userRepository
+        EntityManagerInterface $entityManager,
+        ValidatorInterface $validator
     ): JsonResponse {
+        $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+
+        if (!$user) {
+            throw $this->createNotFoundException(sprintf('No user found with email: "%s"', $email));
+        }
+
         $requestData = json_decode($request->getContent(), true);
+
+        if (isset($requestData['email']) && $requestData['email'] !== $user->getEmail()) {
+            $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $requestData['email']]);
+            if ($existingUser) {
+                return $this->json([
+                    'message' => sprintf('User with email: %s already exists', $requestData['email']),
+                ], 400);
+            }
+        }
 
         if (isset($requestData['name'])) {
             $user->setName($requestData['name']);
@@ -99,9 +118,16 @@ class UserController extends AbstractController
             $user->setCity($requestData['city']);
         }
 
+        $errors = $validator->validate($user);
+        if (count($errors) > 0) {
+            return $this->json([
+                'message' => 'Validation errors',
+                'errors' => (string) $errors,
+            ], 400);
+        }
+
         $user->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
 
-        $entityManager = $doctrine->getManager();
         $entityManager->flush();
 
         return $this->json([
@@ -109,6 +135,8 @@ class UserController extends AbstractController
             'data' => $user,
         ], 201);
     }
+
+
 
     /*
     DELETE
