@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Serializer;
 class UserController extends AbstractController
 {
 
-    #[Route('/login',name: 'login',methods: ['POST'])]
+    #[Route('/login', name: 'login', methods: ['POST'])]
     public function login()
     {
         return new JsonResponse("connected");
@@ -48,39 +48,15 @@ class UserController extends AbstractController
     public function create(
         Request $request,
         UserRepository $userRepository,
-        UserPasswordHasherInterface $passwordHasher
     ): JsonResponse {
         $encoders = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
         $serializer = new Serializer($normalizers, $encoders);
 
-<<<<<<< Updated upstream
         /** @var \App\Entity\User $user */
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
-=======
-        $name = $requestData['name'];
-        $email = $requestData['email'];
-        $birthdate = $requestData['birthdate'];
-        $bio = $requestData['bio'];
-        $city = $requestData['city'];
-        $phonenumber = $requestData['phonenumber'];
->>>>>>> Stashed changes
 
         $user->setUpdatedAt(new \DateTimeImmutable());
-
-<<<<<<< Updated upstream
-        $user->setPassword($passwordHasher->hashPassword($user,$user->getPassword()));
-=======
-        $user = new User();
-        $user->setName($name);
-        $user->setEmail($email);
-        $user->setCreatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
-        $user->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
-        $user->setBirthdate($birthdate);
-        $user->setBio($bio);
-        $user->setCity($city);
-        $user->setphonenumber($phonenumber);
->>>>>>> Stashed changes
 
         $userRepository->save($user, true);
 
@@ -121,15 +97,6 @@ class UserController extends AbstractController
 
         if (isset($requestData['city'])) {
             $user->setCity($requestData['city']);
-        }
-
-<<<<<<< Updated upstream
-        if (isset($requestData['admin'])) {
-            $user->setAdmin($requestData['admin']);
-=======
-        if (isset($requestData['phonenumber'])) {
-            $user->setphonenumber($requestData['phonenumber']);
->>>>>>> Stashed changes
         }
 
         $user->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));

@@ -11,16 +11,9 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-<<<<<<< Updated upstream
 #[ORM\Table(name: 'users_table')]
+
 class User implements UserInterface, PasswordAuthenticatedUserInterface
-=======
-#[ORM\Table(name: "users_table")]
-/**
- * Summary of User
- */
-class User
->>>>>>> Stashed changes
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -45,23 +38,18 @@ class User
     #[ORM\Column(length: 20)]
     private string $phoneNumber;
 
-    #[ORM\Column(length: 255,nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $bio = null;
 
     #[ORM\Column(length: 255)]
     private string $city;
-    #[ORM\Column]
-    private array $roles = [];
 
-    #[ORM\Column]
-    private string $password;
-
-<<<<<<< Updated upstream
     public function __construct()
     {
         $this->created_at = new \DateTimeImmutable();
     }
-=======
+
+
     #[ORM\Column]
     private \DateTimeImmutable $updated_at;
 
@@ -76,7 +64,7 @@ class User
 
     #[ORM\Column(type: 'integer')]
     private $phonenumber;
->>>>>>> Stashed changes
+
 
     public function getId(): ?int
     {
@@ -173,34 +161,6 @@ class User
         return $this;
     }
 
-<<<<<<< Updated upstream
-    public function getRoles(): array
-    {
-        $roles = $this->roles;
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
-    }
-
-    public function setRoles(array $roles): static
-    {
-        $this->roles = $roles;
-
-        return $this;
-    }
-
-    public function getPassword(): string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): static
-    {
-        $this->password = $password;
-        return $this;
-    }
-
-=======
     public function getPhonenumber(): ?int
     {
         return $this->phonenumber;
@@ -212,7 +172,6 @@ class User
 
         return $this;
     }
->>>>>>> Stashed changes
 
 
     public function getUserIdentifier(): string
