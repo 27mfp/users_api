@@ -1,8 +1,13 @@
 # Users API
 
-This is a simple API built with Symfony that allows users to be created, read, updated, and deleted. The API stores user data in a MySQL database.
+## This is a simple API built with Symfony that allows users to be created, read, updated, and deleted. The API stores user data in a MySQL database.
 
-# Requirements
+- Create a new user
+- Read user details
+- Update user details
+- Delete user details
+
+## Requirements
 
 ### To run this API, you will need:
 
@@ -47,7 +52,7 @@ The API should now be accessible at http://localhost:8000.
 ### The API has the following endpoints:
 
     GET api/users - Get a list of all users
-   
+
     POST api/users - Create a new user
 
 This endpoint allows the creation of a new user. The request must include the following parameters:
