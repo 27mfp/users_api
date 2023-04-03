@@ -11,8 +11,16 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+<<<<<<< Updated upstream
 #[ORM\Table(name: 'users_table')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
+=======
+#[ORM\Table(name: "users_table")]
+/**
+ * Summary of User
+ */
+class User
+>>>>>>> Stashed changes
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -48,10 +56,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private string $password;
 
+<<<<<<< Updated upstream
     public function __construct()
     {
         $this->created_at = new \DateTimeImmutable();
     }
+=======
+    #[ORM\Column]
+    private \DateTimeImmutable $updated_at;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    private $birthdate;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    private $bio = null;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    private $city;
+
+    #[ORM\Column(type: 'integer')]
+    private $phonenumber;
+>>>>>>> Stashed changes
 
     public function getId(): ?int
     {
@@ -148,6 +173,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+<<<<<<< Updated upstream
     public function getRoles(): array
     {
         $roles = $this->roles;
@@ -174,6 +200,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+=======
+    public function getPhonenumber(): ?int
+    {
+        return $this->phonenumber;
+    }
+
+    public function setPhonenumber(int $phonenumber): self
+    {
+        $this->phonenumber = $phonenumber;
+
+        return $this;
+    }
+>>>>>>> Stashed changes
 
 
     public function getUserIdentifier(): string

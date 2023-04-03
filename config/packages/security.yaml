@@ -14,6 +14,7 @@ security:
             lazy: true
             provider: user_provider
 
+<<<<<<< Updated upstream
             json_login:
                 check_path: api_login
 
@@ -33,3 +34,22 @@ when@test:
                 cost: 4 # Lowest possible value for bcrypt
                 time_cost: 3 # Lowest possible value for argon
                 memory_cost: 10 # Lowest possible value for argon
+=======
+  providers:
+    users_in_memory:
+      memory:
+        users:
+          api: { password: "%env(BASIC_USER_PASSWORD)%", roles: ["ROLE_USER"] }
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+    main:
+      lazy: true
+      provider: users_in_memory
+      http_basic:
+        realm: Secured Area
+
+  access_control:
+    - { path: ^/api/users, roles: ROLE_USER }
+>>>>>>> Stashed changes

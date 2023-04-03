@@ -3191,7 +3191,7 @@
       <call method="add">
         <argument type="service" id=".security.request_matcher.dtwonV5"/>
         <argument type="collection">
-          <argument>ROLE_ADMIN</argument>
+          <argument>ROLE_USER</argument>
         </argument>
         <argument>null</argument>
       </call>
@@ -3462,12 +3462,6 @@
           <argument key="password">%env(BASIC_USER_PASSWORD)%</argument>
           <argument key="roles" type="collection">
             <argument>ROLE_USER</argument>
-          </argument>
-        </argument>
-        <argument key="admin" type="collection">
-          <argument key="password">%env(BASIC_ADMIN_PASSWORD)%</argument>
-          <argument key="roles" type="collection">
-            <argument>ROLE_ADMIN</argument>
           </argument>
         </argument>
       </argument>
