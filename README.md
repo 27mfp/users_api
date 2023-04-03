@@ -52,26 +52,29 @@ The API should now be accessible at http://localhost:8000.
 ### The API has the following endpoints:
 
     GET api/users - Get a list of all users
+    
+This endpoint list all of the users stored on the database.
 ###    
     POST api/users - Create a new user
 
 This endpoint allows the creation of a new user. The request must include the following parameters:
 name: The name of the user.
 email: The email address of the user.
-
+###
     GET api/users/search?email={email} - Get a specific user by email
 
 This endpoint allows the searching of a user by email address. The request must include the email address of the user to be searched for in the query parameter email.
-
+###
     PUT api/users/{email} - Update a specific user by email
 
 This endpoint allows the updating of an existing user. The request must include the following parameters:
 name: The name of the user.
 email: The email address of the user.
-
+###
     DELETE api/users/{email} - Delete a specific user by email
 
 This endpoint allows the deletion of an existing user. The request must include the email address of the user to be deleted.
+###
 
 ### Requests
 
