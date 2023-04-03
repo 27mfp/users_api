@@ -7,13 +7,11 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users_table')]
 
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -48,23 +46,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->created_at = new \DateTimeImmutable();
     }
-
-
-    #[ORM\Column]
-    private \DateTimeImmutable $updated_at;
-
-    #[ORM\Column(type: 'string', length: 255)]
-    private $birthdate;
-
-    #[ORM\Column(type: 'string', length: 255)]
-    private $bio = null;
-
-    #[ORM\Column(type: 'string', length: 255)]
-    private $city;
-
-    #[ORM\Column(type: 'integer')]
-    private $phonenumber;
-
 
     public function getId(): ?int
     {
@@ -160,19 +141,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
-    public function getPhonenumber(): ?int
-    {
-        return $this->phonenumber;
-    }
-
-    public function setPhonenumber(int $phonenumber): self
-    {
-        $this->phonenumber = $phonenumber;
-
-        return $this;
-    }
-
 
     public function getUserIdentifier(): string
     {
