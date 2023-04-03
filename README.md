@@ -89,7 +89,18 @@ This endpoint allows the deletion of an existing user. The request must include 
 
 To use the API, send HTTP requests to the appropriate endpoint using a tool like curl, Postman, or a web browser. For example, to create a new user using curl, you could run:
 
-    curl -X POST -H "Content-Type: application/json" -d '{"name": "John Smith", "email": "john.smith@example.com"}' http://localhost:8000/users
+    POST /users HTTP/1.1
+    Host: example.com
+    Content-Type: application/json
+
+    {
+        "name": "John Doe",
+        "email": "johndoe@example.com",
+        "birthdate": "1985-06-15",
+        "bio": "A software developer from California",
+        "city": "San Francisco",
+        "phonenumber": "123456789"
+    }
 
 # Conclusion
 
