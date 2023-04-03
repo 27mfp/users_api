@@ -1,6 +1,6 @@
 # Users API
 
-## This is a simple API built with Symfony that allows users to be created, read, updated, and deleted. The API stores user data in a MySQL database.
+## This is a simple API built with Symfony. The API stores user data in a MySQL database.
 
 - Create a new user
 - Read user details
