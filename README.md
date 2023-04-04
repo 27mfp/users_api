@@ -80,7 +80,7 @@ This endpoint allows the updating of an existing user. The request must include 
 - city: The city of the user.
 - phonenumber: The phone number of the user.
 ###
-    DELETE api/users/{email} - Delete a specific user by email
+    DELETE api/users/search/{email} - Delete a specific user by email
 
 This endpoint allows the deletion of an existing user. The request must include the email address of the user to be deleted.
 ###
