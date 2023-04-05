@@ -4,3 +4,23 @@ controllers:
     path: ../src/Controller/
     namespace: App\Controller
   type: attribute
+
+users_search:
+  path: /users
+  methods: GET
+
+users_create:
+  path: /users
+  methods: POST
+
+users_update:
+  path: /users
+  methods: PUT
+
+users_delete:
+  path: /users
+  methods: DELETE
+
+users_single:
+  path: /users/search/{email}
+  methods: GET

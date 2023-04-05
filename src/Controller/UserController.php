@@ -7,17 +7,13 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/api', name: 'api_', methods: ['GET'])]
 class UserController extends AbstractController
@@ -42,11 +38,9 @@ class UserController extends AbstractController
     public function create(
         Request $request,
         UserRepository $userRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        SerializerInterface $serializer
     ): JsonResponse {
-        $encoders = [new JsonEncoder()];
-        $normalizers = [new ObjectNormalizer()];
-        $serializer = new Serializer($normalizers, $encoders);
 
         $data = json_decode($request->getContent(), true);
         $email = $data['email'];
@@ -68,7 +62,6 @@ class UserController extends AbstractController
             'data' => $user,
         ], Response::HTTP_CREATED);
     }
-
 
     /*
     UPDATE
@@ -107,7 +100,7 @@ class UserController extends AbstractController
         }
 
         if (isset($requestData['birthdate'])) {
-            $user->setBirthdate($requestData['birthdate']);
+            $user->setBirthDate($requestData['birthdate']);
         }
 
         if (isset($requestData['bio'])) {
@@ -116,6 +109,10 @@ class UserController extends AbstractController
 
         if (isset($requestData['city'])) {
             $user->setCity($requestData['city']);
+        }
+
+        if (isset($requestData['phone_number'])) {
+            $user->setPhonenumber($requestData['phone_number']);
         }
 
         $errors = $validator->validate($user);
@@ -135,8 +132,6 @@ class UserController extends AbstractController
             'data' => $user,
         ], 201);
     }
-
-
 
     /*
     DELETE
@@ -166,23 +161,17 @@ class UserController extends AbstractController
     SEARCH BY EMAIL
     */
 
-    #[Route('/users/search', name: 'users_search', methods: ['GET'])]
-    public function search(Request $request, UserRepository $userRepository): JsonResponse
+    #[Route('/users/search/{email}', name: 'users_single', methods: ['GET'])]
+    public function search(string $email, UserRepository $userRepository): JsonResponse
     {
-        $email = $request->query->get('email');
+        $user = $userRepository->findOneByEmail($email);
 
-        if (!$email) {
-            throw new BadRequestHttpException('Missing email parameter');
-        }
-
-        $user = $userRepository->findOneBy(['email' => $email]);
-
+        // Handle the case where the user is not found
         if (!$user) {
-            throw $this->createNotFoundException(sprintf('No user found with email "%s"', $email));
+            return new JsonResponse(['message' => 'User not found'], 404);
         }
 
-        return $this->json([
-            'data' => $user,
-        ], 200);
+        // Return the user details as a JSON response
+        return $this->json($user);
     }
 }

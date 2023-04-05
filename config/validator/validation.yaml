@@ -1,0 +1,7 @@
+# config/validator/validation.yaml
+App\Entity\User:
+  properties:
+    email:
+      - Email:
+          message: The email "{{ value }}" is not a valid email.
+          mode: loose

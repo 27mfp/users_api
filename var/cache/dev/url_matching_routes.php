@@ -13,6 +13,12 @@ return [
             [['_route' => 'api_users_list', '_controller' => 'App\\Controller\\UserController::index'], null, ['GET' => 1], null, false, false, null],
             [['_route' => 'api_users_create', '_controller' => 'App\\Controller\\UserController::create'], null, ['GET' => 0, 'POST' => 1], null, false, false, null],
         ],
+        '/users' => [
+            [['_route' => 'users_search'], null, ['GET' => 0], null, false, false, null],
+            [['_route' => 'users_create'], null, ['POST' => 0], null, false, false, null],
+            [['_route' => 'users_update'], null, ['PUT' => 0], null, false, false, null],
+            [['_route' => 'users_delete'], null, ['DELETE' => 0], null, false, false, null],
+        ],
     ],
     [ // $regexpList
         0 => '{^(?'
@@ -21,8 +27,9 @@ return [
                     .'|([^/]++)(?'
                         .'|(*:67)'
                     .')'
-                    .'|search(*:81)'
+                    .'|search/([^/]++)(*:90)'
                 .')'
+                .'|/users/search/([^/]++)(*:120)'
             .')/?$}sDu',
     ],
     [ // $dynamicRoutes
@@ -31,8 +38,9 @@ return [
             [['_route' => 'api_users_update', '_controller' => 'App\\Controller\\UserController::update'], ['email'], ['GET' => 0, 'PUT' => 1, 'PATCH' => 2], null, false, true, null],
             [['_route' => 'api_users_delete', '_controller' => 'App\\Controller\\UserController::delete'], ['email'], ['GET' => 0, 'DELETE' => 1], null, false, true, null],
         ],
-        81 => [
-            [['_route' => 'api_users_search', '_controller' => 'App\\Controller\\UserController::search'], [], ['GET' => 1], null, false, false, null],
+        90 => [[['_route' => 'api_users_single', '_controller' => 'App\\Controller\\UserController::search'], ['email'], ['GET' => 1], null, false, true, null]],
+        120 => [
+            [['_route' => 'users_single'], ['email'], ['GET' => 0], null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],
     ],

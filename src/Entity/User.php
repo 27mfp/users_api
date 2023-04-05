@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users_table')]
+#[UniqueEntity(fields: ['email'])]
 
 class User
 {
@@ -18,27 +23,33 @@ class User
     #[ORM\Column]
     private int $id;
 
+    #[Assert\NotBlank]
     #[ORM\Column(length: 255)]
     private string $name;
 
-    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Email]
+    #[ORM\Column(length: 255, unique: true)]
     private string $email;
 
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeInterface $created_at;
 
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeInterface $updated_at;
 
-    #[ORM\Column(length: 255)]
-    private string $birthdate;
+    #[ORM\Column(type: "date")]
+    private $birthDate;
 
-    #[ORM\Column(length: 20)]
-    private string $phoneNumber;
+    #[Assert\NotBlank]
+    #[ORM\Column(length: 20, type: "integer")]
+    private $phone_number;
 
+    #[Assert\NotBlank]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $bio = null;
 
+    #[Assert\NotBlank]
     #[ORM\Column(length: 255)]
     private string $city;
 
@@ -93,30 +104,28 @@ class User
         return $this;
     }
 
-    public function getBirthdate(): ?string
+    public function getBirthDate(): ?\DateTimeInterface
     {
-        return $this->birthdate;
+        return $this->birthDate;
     }
 
-    public function setBirthdate(string $birthdate): static
+    public function setBirthDate(?\DateTimeInterface $birthDate): self
     {
-        $this->birthdate = $birthdate;
+        $this->birthDate = $birthDate;
 
         return $this;
     }
 
-    public function getPhoneNumber(): string
+    public function getPhoneNumber(): ?int
     {
-        return $this->phoneNumber;
+        return $this->phone_number;
     }
 
-    public function setPhoneNumber(string $phoneNumber): static
+    public function setPhoneNumber(int $phone_number): static
     {
-        $this->phoneNumber = $phoneNumber;
+        $this->phone_number = $phone_number;
         return $this;
     }
-
-
 
     public function getBio(): ?string
     {
