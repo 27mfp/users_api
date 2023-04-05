@@ -16,6 +16,6 @@ if (!\class_exists(App_KernelDevDebugContainer::class, false)) {
 
 return new \ContainerGsxPNAk\App_KernelDevDebugContainer([
     'container.build_hash' => 'GsxPNAk',
-    'container.build_id' => 'eb384f94',
-    'container.build_time' => 1680689912,
+    'container.build_id' => 'aaa3a043',
+    'container.build_time' => 1680694605,
 ], __DIR__.\DIRECTORY_SEPARATOR.'ContainerGsxPNAk');

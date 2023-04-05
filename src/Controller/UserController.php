@@ -14,6 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
+use League\Fractal\Serializer\JsonApiSerializer;
 
 #[Route('/api', name: 'api_', methods: ['GET'])]
 class UserController extends AbstractController
@@ -25,9 +28,24 @@ class UserController extends AbstractController
     #[Route('/users', name: 'users_list', methods: ['GET'])]
     public function index(UserRepository $userRepository): JsonResponse
     {
-        return $this->json([
-            'data' => $userRepository->findAll(),
-        ]);
+        $fractal = new Manager();
+        $fractal->setSerializer(new JsonApiSerializer());
+
+        $users = $userRepository->findAll();
+        $resource = new Collection($users, function ($user) {
+            return [
+                'id' => $user->getId(),
+                'name' => $user->getName(),
+                'email' => $user->getEmail(),
+                'phone_number' => $user->getPhonenumber(),
+                'bio' => $user->getBio(),
+                'city' => $user->getCity(),
+                'birthdate' => $user->getBirthdate()->format('Y-m-d')
+            ];
+        });
+
+        $data = $fractal->createData($resource)->toArray();
+        return new JsonResponse($data);
     }
 
     /*

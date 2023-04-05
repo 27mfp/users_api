@@ -85,6 +85,10 @@ class ComposerStaticInitce8217233dcd5c428692f03bb77fbbd9
             'PhpParser\\' => 10,
             'PHPStan\\PhpDocParser\\' => 21,
         ),
+        'L' => 
+        array (
+            'League\\Fractal\\' => 15,
+        ),
         'D' => 
         array (
             'Doctrine\\SqlFormatter\\' => 22,
@@ -328,6 +332,10 @@ class ComposerStaticInitce8217233dcd5c428692f03bb77fbbd9
         'PHPStan\\PhpDocParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src',
+        ),
+        'League\\Fractal\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/league/fractal/src',
         ),
         'Doctrine\\SqlFormatter\\' => 
         array (

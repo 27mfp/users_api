@@ -1,0 +1,25 @@
+# Symfony cache and logs
+/var/
+/var/cache/
+/var/log/
+/var/sessions/
+/var/spool/
+/var/tmp/
+
+# Vendor directory (if using Composer)
+/vendor/
+
+# IDE and editor files
+/.idea/
+/.vscode/
+/.phpstorm.meta.php
+/.phpstorm.meta.php.ser
+/.phpstorm.stubs.php
+/.phpunit.result.cache
+/.phpunit.result.cache.old
+
+# Environment file
+/.env
+
+# Composer lock file
+/composer.lock

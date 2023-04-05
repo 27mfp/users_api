@@ -357,3 +357,18 @@ $classes[] = 'Symfony\Component\Validator\Constraints\NotCompromisedPasswordVali
 $classes[] = 'Symfony\Component\Validator\Constraints\WhenValidator';
 
 $preloaded = Preloader::preload($classes);
+require_once __DIR__.'/twig/36/36d1e0e17e2b0e663fe64cf2d4588356.php';
+require_once __DIR__.'/twig/9c/9ca8f799d2988aba715d60b1743e14c5.php';
+require_once __DIR__.'/twig/3a/3a8675de3fdc8525dac9b9424fd3212e.php';
+require_once __DIR__.'/twig/d9/d9ce32c58f75a9764a8902709f474e81.php';
+require_once __DIR__.'/twig/98/98a553d0e179df9a1c73ddf822b7eef9.php';
+
+$classes = [];
+$classes[] = 'Symfony\\Component\\Routing\\Generator\\CompiledUrlGenerator';
+$classes[] = 'Symfony\\Bundle\\FrameworkBundle\\Routing\\RedirectableCompiledUrlMatcher';
+$classes[] = 'Symfony\\Component\\Validator\\Mapping\\ClassMetadata';
+$classes[] = 'Symfony\\Bridge\\Doctrine\\Validator\\Constraints\\UniqueEntity';
+$classes[] = 'Symfony\\Component\\Validator\\Mapping\\PropertyMetadata';
+$classes[] = 'Symfony\\Component\\Validator\\Constraints\\Email';
+$classes[] = 'Symfony\\Component\\Validator\\Constraints\\NotBlank';
+$preloaded = Preloader::preload($classes, $preloaded);
