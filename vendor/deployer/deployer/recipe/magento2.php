@@ -4,14 +4,17 @@ namespace Deployer;
 require_once __DIR__ . '/common.php';
 require_once __DIR__ . '/../contrib/cachetool.php';
 
-
+use Deployer\Exception\ConfigurationException;
 use Deployer\Exception\GracefulShutdownException;
 use Deployer\Exception\RunException;
 use Deployer\Host\Host;
+use Symfony\Component\VarExporter\VarExporter;
 
 const CONFIG_IMPORT_NEEDED_EXIT_CODE = 2;
 const DB_UPDATE_NEEDED_EXIT_CODE = 2;
 const MAINTENANCE_MODE_ACTIVE_OUTPUT_MSG = 'maintenance mode is active';
+const ENV_CONFIG_FILE_PATH = 'app/etc/env.php';
+const TMP_ENV_CONFIG_FILE_PATH = 'app/etc/env_tmp.php';
 
 add('recipes', ['magento2']);
 
@@ -26,9 +29,33 @@ set('static_content_locales', 'en_US');
 
 // You can also set the themes to run against. By default it'll deploy
 // all themes - `add('magento_themes', ['Magento/luma', 'Magento/backend']);`
+// If the themes are set as a simple list of strings, then all languages defined in {{static_content_locales}} are
+// compiled for the given themes.
+// Alternatively The themes can be defined as an associative array, where the key represents the theme name and
+// the key contains the languages for the compilation (for this specific theme)
+// Example:
+// set('magento_themes', ['Magento/luma']); - Will compile this theme with every language from {{static_content_locales}}
+// set('magento_themes', [
+//     'Magento/luma'   => null,                              - Will compile all languages from {{static_content_locales}} for Magento/luma
+//     'Custom/theme'   => 'en_US fr_FR'                      - Will compile only en_US and fr_FR for Custom/theme
+//     'Custom/another' => '{{static_content_locales}} it_IT' - Will compile all languages from {{static_content_locales}} + it_IT for Custom/another
+// ]); - Will compile this theme with every language
 set('magento_themes', [
 
 ]);
+
+// Static content deployment options, e.g. '--no-parent'
+set('static_deploy_options', '');
+
+// Deploy frontend and adminhtml together as default
+set('split_static_deployment', false);
+
+// Use the default languages for the backend as default
+set('static_content_locales_backend', '{{static_content_locales}}');
+
+// backend themes to deploy. Only used if split_static_deployment=true
+// This setting supports the same options/structure as {{magento_themes}}
+set('magento_themes_backend', ['Magento/backend' => null]);
 
 // Configuration
 
@@ -88,34 +115,141 @@ set('magento_version', function () {
     return $matches[0] ?? '2.0';
 });
 
-set('maintenance_mode_status_active', function () {
-    // detect maintenance mode active
-    $maintenanceModeStatusOutput = run("{{bin/php}} {{bin/magento}} maintenance:status");
-    return strpos($maintenanceModeStatusOutput, MAINTENANCE_MODE_ACTIVE_OUTPUT_MSG) !== false;
+set('config_import_needed', function () {
+    // detect if app:config:import is needed
+    try {
+        run('{{bin/php}} {{bin/magento}} app:config:status');
+    } catch (RunException $e) {
+        if ($e->getExitCode() == CONFIG_IMPORT_NEEDED_EXIT_CODE) {
+            return true;
+        }
+
+        throw $e;
+    }
+    return false;
+});
+
+set('database_upgrade_needed', function () {
+    // detect if setup:upgrade is needed
+    try {
+        run('{{bin/php}} {{bin/magento}} setup:db:status');
+    } catch (RunException $e) {
+        if ($e->getExitCode() == DB_UPDATE_NEEDED_EXIT_CODE) {
+            return true;
+        }
+
+        throw $e;
+    }
+    return false;
 });
 
 // Deploy without setting maintenance mode if possible
 set('enable_zerodowntime', true);
 
+//deploy with auto updating cache index_prefix
+set('use_redis_cache_id', false);
+
 // Tasks
+
+// To work correctly with artifact deployment, it is necessary to set the MAGE_MODE correctly in `app/etc/config.php`
+// e.g.
+// ```php
+// 'MAGE_MODE' => 'production'
+// ```
 desc('Compiles magento di');
 task('magento:compile', function () {
     run("{{bin/php}} {{bin/magento}} setup:di:compile");
     run('cd {{release_or_current_path}}/{{magento_dir}} && {{bin/composer}} dump-autoload -o');
 });
 
+// To work correctly with artifact deployment it is necessary to set `system/dev/js` , `system/dev/css` and `system/dev/template`
+// in `app/etc/config.php`, e.g.:
+// ```php
+// 'system' => [
+//     'default' => [
+//         'dev' => [
+//             'js' => [
+//                 'merge_files' => '1',
+//                 'minify_files' => '1'
+//             ],
+//             'css' => [
+//                 'merge_files' => '1',
+//                 'minify_files' => '1'
+//             ],
+//             'template' => [
+//                 'minify_html' => '1'
+//             ]
+//         ]
+//     ]
+// ```
 desc('Deploys assets');
 task('magento:deploy:assets', function () {
-
     $themesToCompile = '';
-    if (count(get('magento_themes')) > 0) {
-        foreach (get('magento_themes') as $theme) {
-            $themesToCompile .= ' -t ' . $theme;
+    if (get('split_static_deployment')) {
+        invoke('magento:deploy:assets:adminhtml');
+        invoke('magento:deploy:assets:frontend');
+    } else {
+        if (count(get('magento_themes')) > 0 ) {
+            foreach (get('magento_themes') as $theme) {
+                $themesToCompile .= ' -t ' . $theme;
+            }
         }
+        run("{{bin/php}} {{release_or_current_path}}/bin/magento setup:static-content:deploy --content-version={{content_version}} {{static_deploy_options}} {{static_content_locales}} $themesToCompile -j {{static_content_jobs}}");
+    }
+});
+
+desc('Deploys assets for backend only');
+task('magento:deploy:assets:adminhtml', function () {
+    magentoDeployAssetsSplit('backend');
+});
+
+desc('Deploys assets for frontend only');
+task('magento:deploy:assets:frontend', function () {
+    magentoDeployAssetsSplit('frontend');
+});
+
+/**
+ * @phpstan-param 'frontend'|'backend' $area
+ *
+ * @throws ConfigurationException
+ */
+function magentoDeployAssetsSplit(string $area)
+{
+    if (!in_array($area, ['frontend', 'backend'], true)) {
+        throw new ConfigurationException("\$area must be either 'frontend' or 'backend', '$area' given");
     }
 
-    run("{{bin/php}} {{bin/magento}} setup:static-content:deploy --content-version={{content_version}} {{static_content_locales}} $themesToCompile -j {{static_content_jobs}}");
-});
+    $isFrontend = $area === 'frontend';
+    $suffix = $isFrontend
+        ? ''
+        : '_backend';
+
+    $themesConfig = get("magento_themes$suffix");
+    $defaultLanguages = get("static_content_locales$suffix");
+    $useDefaultLanguages = array_is_list($themesConfig);
+
+    /** @var list<string> $themes */
+    $themes = $useDefaultLanguages
+        ? array_values($themesConfig)
+        : array_keys($themesConfig);
+
+    $staticContentArea = $isFrontend
+        ? 'frontend'
+        : 'adminhtml';
+
+    if ($useDefaultLanguages) {
+        $themes = '-t '.implode(' -t ', $themes);
+
+        run("{{bin/php}} {{release_or_current_path}}/bin/magento setup:static-content:deploy -f --area=$staticContentArea --content-version={{content_version}} {{static_deploy_options}} $defaultLanguages $themes -j {{static_content_jobs}}");
+        return;
+    }
+
+    foreach ($themes as $theme) {
+        $languages = parse($themesConfig[$theme] ?? $defaultLanguages);
+
+        run("{{bin/php}} {{release_or_current_path}}/bin/magento setup:static-content:deploy -f --area=$staticContentArea --content-version={{content_version}} {{static_deploy_options}} $languages -t $theme -j {{static_content_jobs}}");
+    }
+}
 
 desc('Syncs content version');
 task('magento:sync:content_version', function () {
@@ -139,65 +273,28 @@ task('magento:maintenance:disable', function () {
     run("if [ -d $(echo {{current_path}}) ]; then {{bin/php}} {{current_path}}/{{magento_dir}}/bin/magento maintenance:disable; fi");
 });
 
+desc('Set maintenance mode if needed');
+task('magento:maintenance:enable-if-needed', function () {
+    ! get('enable_zerodowntime') || get('database_upgrade_needed') || get('config_import_needed') ?
+        invoke('magento:maintenance:enable') :
+        writeln('Config and database up to date => no maintenance mode');
+});
+
 desc('Config Import');
 task('magento:config:import', function () {
-    $configImportNeeded = false;
-
-    if(version_compare(get('magento_version'), '2.2.0', '<')) {
-        //app:config:import command does not exist in 2.0.x and 2.1.x branches
-        $configImportNeeded = false;
-    } elseif(version_compare(get('magento_version'), '2.2.4', '<')) {
-        //app:config:status command does not exist until 2.2.4, so proceed with config:import in every deploy
-        $configImportNeeded = true;
-    } else {
-        try {
-            run('{{bin/php}} {{bin/magento}} app:config:status');
-        } catch (RunException $e) {
-            if ($e->getExitCode() == CONFIG_IMPORT_NEEDED_EXIT_CODE) {
-                $configImportNeeded = true;
-            } else {
-                throw $e;
-            }
-        }
-    }
-
-    if ($configImportNeeded) {
-        if (get('enable_zerodowntime') && !get('maintenance_mode_status_active')) {
-            invoke('magento:maintenance:enable');
-        }
-
+    if (get('config_import_needed')) {
         run('{{bin/php}} {{bin/magento}} app:config:import --no-interaction');
-
-        if (get('enable_zerodowntime') && !get('maintenance_mode_status_active')) {
-            invoke('magento:maintenance:disable');
-        }
+    } else {
+        writeln('App config is up to date => import skipped');
     }
 });
 
 desc('Upgrades magento database');
 task('magento:upgrade:db', function () {
-    $databaseUpgradeNeeded = false;
-
-    try {
-        run('{{bin/php}} {{bin/magento}} setup:db:status');
-    } catch (RunException $e) {
-        if ($e->getExitCode() == DB_UPDATE_NEEDED_EXIT_CODE) {
-            $databaseUpgradeNeeded = true;
-        } else {
-            throw $e;
-        }
-    }
-
-    if ($databaseUpgradeNeeded) {
-        if (get('enable_zerodowntime') && !get('maintenance_mode_status_active')) {
-            invoke('magento:maintenance:enable');
-        }
-
+    if (get('database_upgrade_needed')) {
         run("{{bin/php}} {{bin/magento}} setup:upgrade --keep-generated --no-interaction");
-
-        if (get('enable_zerodowntime') && !get('maintenance_mode_status_active')) {
-            invoke('magento:maintenance:disable');
-        }
+    } else {
+        writeln('Database schema is up to date => upgrade skipped');
     }
 });
 
@@ -209,8 +306,10 @@ task('magento:cache:flush', function () {
 desc('Magento2 deployment operations');
 task('deploy:magento', [
     'magento:build',
+    'magento:maintenance:enable-if-needed',
     'magento:config:import',
     'magento:upgrade:db',
+    'magento:maintenance:disable',
     'magento:cache:flush',
 ]);
 
@@ -231,16 +330,25 @@ task('deploy', [
 
 after('deploy:failed', 'magento:maintenance:disable');
 
-// artifact deployment section
-// settings section
+// Artifact deployment section
+
+// The file the artifact is saved to
 set('artifact_file', 'artifact.tar.gz');
+
+// The directory the artifact is saved in
 set('artifact_dir', 'artifacts');
+
+// Points to a file with a list of files to exclude from packaging.
+// The format is as with the `tar --exclude-from=[file]` option
 set('artifact_excludes_file', 'artifacts/excludes');
+
 // If set to true, the artifact is built from a clean copy of the project repository instead of the current working directory
 set('build_from_repo', false);
+
 // Set this value if "build_from_repo" is set to true. The target to deploy must also be set with "--branch", "--tag" or "--revision"
 set('repository', null);
 
+// The relative path to the artifact file. If the directory does not exist, it will be created
 set('artifact_path', function () {
     if (!testLocally('[ -d {{artifact_dir}} ]')) {
         runLocally('mkdir -p {{artifact_dir}}');
@@ -248,6 +356,7 @@ set('artifact_path', function () {
     return get('artifact_dir') . '/' . get('artifact_file');
 });
 
+// The location of the tar command. On MacOS you should have installed gtar, as it supports the required settings
 set('bin/tar', function () {
     if (commandExist('gtar')) {
         return which('gtar');
@@ -257,6 +366,7 @@ set('bin/tar', function () {
 });
 
 // tasks section
+
 desc('Packages all relevant files in an artifact.');
 task('artifact:package', function() {
     if (!test('[ -f {{artifact_excludes_file}} ]')) {
@@ -264,7 +374,7 @@ task('artifact:package', function() {
             "No artifact excludes file provided, provide one at artifacts/excludes or change location"
         );
     }
-    run('{{bin/tar}} --exclude-from={{artifact_excludes_file}} -czf {{artifact_path}} {{release_or_current_path}}');
+    run('{{bin/tar}} --exclude-from={{artifact_excludes_file}} -czf {{artifact_path}} -C {{release_or_current_path}} .');
 });
 
 desc('Uploads artifact in release folder for extraction.');
@@ -309,17 +419,14 @@ task('build:prepare', function() {
 });
 
 desc('Builds an artifact.');
-task(
-    'artifact:build',
-    [
+task('artifact:build', [
         'build:prepare',
         'build:remove-generated',
         'deploy:vendors',
         'magento:compile',
         'magento:deploy:assets',
         'artifact:package',
-    ]
-);
+]);
 
 // Array of shared files that will be added to the default shared_files without overriding
 set('additional_shared_files', []);
@@ -333,11 +440,60 @@ task('deploy:additional-shared', function () {
     add('shared_dirs', get('additional_shared_dirs'));
 });
 
+/**
+ * Update cache id_prefix on deploy so that you are compiling against a fresh cache
+ * Reference Issue: https://github.com/davidalger/capistrano-magento2/issues/151
+ * use set('use_redis_cache_id') in your deployer script to enable
+ **/
+desc('Update cache id_prefix');
+task('magento:set_cache_prefix', function () {
+    //download current env config
+    $tmpConfigFile = tempnam(sys_get_temp_dir(), 'deployer_config');
+    download('{{deploy_path}}/shared/' . ENV_CONFIG_FILE_PATH, $tmpConfigFile);
+    $envConfigArray = include($tmpConfigFile);
+    //set prefix to `alias_releasename_`
+    $prefixUpdate = get('alias') . '_' . get('release_name') . '_';
+
+    //update id_prefix to include release name
+    $envConfigArray['cache']['frontend']['default']['id_prefix'] = $prefixUpdate;
+    $envConfigArray['cache']['frontend']['page_cache']['id_prefix'] = $prefixUpdate;
+
+    //Generate configuration array as string
+    $envConfigStr = '<?php return ' . VarExporter::export($envConfigArray) . ';';
+    file_put_contents($tmpConfigFile, $envConfigStr);
+    //upload updated config to server
+    upload($tmpConfigFile, '{{deploy_path}}/shared/' . TMP_ENV_CONFIG_FILE_PATH);
+    //cleanup tmp file
+    unlink($tmpConfigFile);
+    //delete the symlink for env.php
+    run('rm {{release_or_current_path}}/' . ENV_CONFIG_FILE_PATH);
+    //link the env to the tmp version
+    run('{{bin/symlink}} {{deploy_path}}/shared/' . TMP_ENV_CONFIG_FILE_PATH . ' {{release_path}}/' . ENV_CONFIG_FILE_PATH);
+});
+//get current env config
+if (get('use_redis_cache_id')) {
+    after('deploy:shared', 'magento:set_cache_prefix');
+}
+
+/**
+ * After successful deployment, move the tmp_env.php file to env.php ready for next deployment
+ */
+desc('Cleanup cache id_prefix env files');
+task('magento:cleanup_cache_prefix', function () {
+    run('rm {{deploy_path}}/shared/' . ENV_CONFIG_FILE_PATH);
+    run('rm {{release_or_current_path}}/' . ENV_CONFIG_FILE_PATH);
+    run('mv {{deploy_path}}/shared/' . TMP_ENV_CONFIG_FILE_PATH . ' {{deploy_path}}/shared/' . ENV_CONFIG_FILE_PATH);
+    // Symlink shared dir to release dir
+    run('{{bin/symlink}} {{deploy_path}}/shared/' . ENV_CONFIG_FILE_PATH . ' {{release_path}}/' . ENV_CONFIG_FILE_PATH);
+});
+//get current env config
+if (get('use_redis_cache_id')) {
+    after('deploy:magento', 'magento:cleanup_cache_prefix');
+}
+
 
 desc('Prepares an artifact on the target server');
-task(
-    'artifact:prepare',
-    [
+task('artifact:prepare', [
         'deploy:info',
         'deploy:setup',
         'deploy:lock',
@@ -347,30 +503,25 @@ task(
         'deploy:additional-shared',
         'deploy:shared',
         'deploy:writable',
-    ]
-);
+]);
 
 desc('Executes the tasks after artifact is released');
-task(
-    'artifact:finish',
-    [
+task('artifact:finish', [
         'magento:cache:flush',
         'cachetool:clear:opcache',
         'deploy:cleanup',
         'deploy:unlock',
-    ]
-);
+]);
 
 desc('Actually releases the artifact deployment');
-task(
-    'artifact:deploy',
-    [
+task('artifact:deploy', [
         'artifact:prepare',
-        'magento:upgrade:db',
+        'magento:maintenance:enable-if-needed',
         'magento:config:import',
+        'magento:upgrade:db',
+        'magento:maintenance:disable',
         'deploy:symlink',
-        'artifact:finish'
-    ]
-);
+        'artifact:finish',
+]);
 
 fail('artifact:deploy', 'deploy:failed');

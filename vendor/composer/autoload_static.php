@@ -68,11 +68,15 @@ class ComposerStaticInitce8217233dcd5c428692f03bb77fbbd9
             'Symfony\\Component\\Console\\' => 26,
             'Symfony\\Component\\Config\\' => 25,
             'Symfony\\Component\\Cache\\' => 24,
+            'Symfony\\Bundle\\WebProfilerBundle\\' => 33,
             'Symfony\\Bundle\\TwigBundle\\' => 26,
             'Symfony\\Bundle\\SecurityBundle\\' => 30,
+            'Symfony\\Bundle\\MonologBundle\\' => 29,
             'Symfony\\Bundle\\MakerBundle\\' => 27,
             'Symfony\\Bundle\\FrameworkBundle\\' => 31,
+            'Symfony\\Bundle\\DebugBundle\\' => 27,
             'Symfony\\Bridge\\Twig\\' => 20,
+            'Symfony\\Bridge\\Monolog\\' => 23,
             'Symfony\\Bridge\\Doctrine\\' => 24,
             'Sensio\\Bundle\\FrameworkExtraBundle\\' => 35,
         ),
@@ -84,6 +88,14 @@ class ComposerStaticInitce8217233dcd5c428692f03bb77fbbd9
             'Psr\\Cache\\' => 10,
             'PhpParser\\' => 10,
             'PHPStan\\PhpDocParser\\' => 21,
+        ),
+        'N' => 
+        array (
+            'Nelmio\\CorsBundle\\' => 18,
+        ),
+        'M' => 
+        array (
+            'Monolog\\' => 8,
         ),
         'L' => 
         array (
@@ -281,6 +293,10 @@ class ComposerStaticInitce8217233dcd5c428692f03bb77fbbd9
         array (
             0 => __DIR__ . '/..' . '/symfony/cache',
         ),
+        'Symfony\\Bundle\\WebProfilerBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/web-profiler-bundle',
+        ),
         'Symfony\\Bundle\\TwigBundle\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/twig-bundle',
@@ -288,6 +304,10 @@ class ComposerStaticInitce8217233dcd5c428692f03bb77fbbd9
         'Symfony\\Bundle\\SecurityBundle\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/security-bundle',
+        ),
+        'Symfony\\Bundle\\MonologBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/monolog-bundle',
         ),
         'Symfony\\Bundle\\MakerBundle\\' => 
         array (
@@ -297,9 +317,17 @@ class ComposerStaticInitce8217233dcd5c428692f03bb77fbbd9
         array (
             0 => __DIR__ . '/..' . '/symfony/framework-bundle',
         ),
+        'Symfony\\Bundle\\DebugBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/debug-bundle',
+        ),
         'Symfony\\Bridge\\Twig\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/twig-bridge',
+        ),
+        'Symfony\\Bridge\\Monolog\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/monolog-bridge',
         ),
         'Symfony\\Bridge\\Doctrine\\' => 
         array (
@@ -332,6 +360,14 @@ class ComposerStaticInitce8217233dcd5c428692f03bb77fbbd9
         'PHPStan\\PhpDocParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src',
+        ),
+        'Nelmio\\CorsBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/nelmio/cors-bundle',
+        ),
+        'Monolog\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
         'League\\Fractal\\' => 
         array (

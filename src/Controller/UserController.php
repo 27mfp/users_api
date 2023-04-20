@@ -17,6 +17,9 @@ use Symfony\Component\Serializer\SerializerInterface;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Serializer\JsonApiSerializer;
+use League\Fractal\Serializer\ArraySerializer;
+use DateTime;
+
 
 #[Route('/api', name: 'api_', methods: ['GET'])]
 class UserController extends AbstractController
@@ -29,18 +32,21 @@ class UserController extends AbstractController
     public function index(UserRepository $userRepository): JsonResponse
     {
         $fractal = new Manager();
-        $fractal->setSerializer(new JsonApiSerializer());
+        $fractal->setSerializer(new ArraySerializer());
 
         $users = $userRepository->findAll();
+
         $resource = new Collection($users, function ($user) {
             return [
                 'id' => $user->getId(),
                 'name' => $user->getName(),
                 'email' => $user->getEmail(),
-                'phone_number' => $user->getPhonenumber(),
-                'bio' => $user->getBio(),
-                'city' => $user->getCity(),
-                'birthdate' => $user->getBirthdate()->format('Y-m-d')
+		'phone_number' => $user->getPhonenumber(),
+		'birthdate' => $user->getBirthdate()->format('Y-m-d'),
+		'bio' => $user->getBio(),
+		'city' => $user->getCity(),
+		'created_at' => $user->getCreatedAt()->format('Y-m-d H:i:s'),
+		'updated_at' => $user->getUpdatedAt()->format('Y-m-d H:i:s')
             ];
         });
 
@@ -99,7 +105,6 @@ class UserController extends AbstractController
         }
 
         $requestData = json_decode($request->getContent(), true);
-
         if (isset($requestData['email']) && $requestData['email'] !== $user->getEmail()) {
             $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $requestData['email']]);
             if ($existingUser) {
@@ -118,7 +123,8 @@ class UserController extends AbstractController
         }
 
         if (isset($requestData['birthdate'])) {
-            $user->setBirthDate($requestData['birthdate']);
+	    $birthdate = new DateTime($requestData['birthdate']);
+            $user->setBirthDate($birthdate);
         }
 
         if (isset($requestData['bio'])) {
@@ -141,7 +147,7 @@ class UserController extends AbstractController
             ], 400);
         }
 
-        $user->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
+        $user->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/London')));
 
         $entityManager->flush();
 
